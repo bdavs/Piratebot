@@ -10,7 +10,9 @@ def find_ship(captain):
     for s in ships:
         if s['captain'] == captain:
             s['position'] = index
-            return s
+            temp_ship = Ship(captain)
+            temp_ship.from_dict(s)
+            return temp_ship
         index += 1
     return None
 
@@ -53,7 +55,11 @@ class Ship:
             'sails': self.sails
         }
 
-    def from_dict(self,json_data):
+    def from_dict(self, json_data):
+
+        if json_data is None:
+            return None
+
         self.captain = json_data['captain']
         self.cannons = json_data['cannons']
         self.crews = json_data['crews']
@@ -76,16 +82,14 @@ class Pirate:
         captain = ctx.message.author.name
         """look at ship."""
 
-        myship_dict = find_ship(captain)
+        myship = find_ship(captain)
 
-        if not myship_dict:
+        if not myship:
             myship = Ship(captain)
             ships.append(myship.to_dict())
             print('appended')
 
         else:
-            myship = Ship(captain)
-            myship.from_dict(find_ship(captain))
             print(myship.upgrade("crews", 10))
             ships[myship.position] = myship.to_dict()
             print('upgraded')
@@ -102,21 +106,40 @@ class Pirate:
         defenders = ctx.message.mentions
         if not defenders:
             await self.bot.say('Who are you fighting?')
+            return
         elif len(defenders)>1:
             await self.bot.say('Who are you fighting? One at a time (for now)')
+            return
         else:
             defender = defenders[0].name
             await self.bot.say('{0} has attacked {1}'.format(attacker, defender))
 
+            attacker_ship = find_ship(attacker)
+            if not attacker_ship:
+                await self.bot.say('{0} does not have a ship! do something to get one'.format(attacker))
+                return
+
+            defender_ship = find_ship(defender)
+            if not defender_ship:
+                await self.bot.say('{0} does not have a ship! There are no fights'
+                                   ' on the high sea if there are no ships to fight'.format(defender))
+                return
+
             attack = random.randint(1, 100)
+            attack += attacker_ship.cannons + attacker_ship.crews
+            attack -= defender_ship.armor + defender_ship.sails
+
             defense = random.randint(1, 100)
-            #attack +=
+            defense += defender_ship.cannons + defender_ship.crews
+            defense -= attacker_ship.armor + attacker_ship.sails
+
             if attack > defense:
                 winner = attacker
             else:
                 winner = defender
 
-            await self.bot.say('{0} shot {2} cannonballs and {1} shot {3}. {4} is the winner!'.format(attacker, defender, attack, defense, winner))
+            await self.bot.say('{0} shot {2} cannonballs and {1} shot {3}.'
+                               ' {4} is the winner!'.format(attacker, defender, attack, defense, winner))
 
 
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description='a pirate ship bot')
@@ -135,7 +158,8 @@ with open("ship_file.json", "r") as read_file:
     if first:
         read_file.seek(0)
         json_data = json.load(read_file)
-        ships.append(json_data[0])
+        for s in json_data:
+            ships.append(s)
 
         print("here are the ships:")
         print(ships)

@@ -3,10 +3,7 @@ import random
 from discord.ext import commands
 from tokenfile import TOKEN
 
-
-
 class Pirate:
-
 
     def __init__(self, bot):
         self.bot = bot
@@ -14,7 +11,6 @@ class Pirate:
 
 # maybe be safe later
 #    def __unload(self):
-
 
     @commands.command(pass_context=True, no_pm=True)
     async def ship(self, args):
@@ -30,11 +26,17 @@ class Pirate:
             await self.bot.say('Who are you fighting?')
         else:
             defender = defenders[0].name
-            await self.bot.say('You are {0} and attacked {1}'.format(attacker,defender))
+            await self.bot.say('{0} has attacked {1}'.format(attacker, defender))
 
+            attack = random.randint(1,100)
+            defense = random.randint(1,100)
 
+            if attack > defense:
+                winner = attacker
+            else:
+                winner = defender
 
-
+            await self.bot.say('{0} shot {2} cannonballs and {1} shot {3}. {4} is the winner!'.format(attacker, defender, attack, defense, winner))
 
 
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description='a piratey bot')

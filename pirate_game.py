@@ -5,6 +5,13 @@ from discord.ext import commands
 from tokenfile import TOKEN
 
 
+def findShip(captain):
+    for s in ships:
+        if s['captain'] == captain:
+            return s
+    return None
+
+
 class Ship:
 
     def __init__(self, user):
@@ -48,15 +55,21 @@ class Pirate:
 # maybe be safe later
 #    def __unload(self):
 
+
     @commands.command(pass_context=True, no_pm=True)
     async def ship(self, ctx):
+        captain = ctx.message.author.name
         """look at ship."""
-        myship = Ship(ctx.message.author.name)
-        sometext = myship.info()
-        await self.bot.say('your ship is fucking awesome, here\'s what its got: \n'+sometext)
+
+        myship = findShip(captain)
+
+        if not myship:
+            myship = Ship(captain)
+
+        await self.bot.say('your ship is fucking awesome, here\'s what its got: \n'+ myship.info())
+
         ships.append(myship.toJSON())
         jsonData = ships
-        print(ships, myship.toJSON())
         with open("ship_file.json", "w") as write_file:
             json.dump(jsonData, write_file)
 

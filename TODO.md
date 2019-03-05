@@ -1,10 +1,12 @@
 # To do
-- [ ] updating json parameters
-- [ ] add checks for ships when fighting
-- [ ] add ship parameters to fight
+- [x] updating json parameters
+- [x] add checks for ships when fighting
+- [x] add ship parameters to fight
 - [ ] create way to store gold (fights win you gold)
-- [ ] incorporate upgrades (with gold mechanic?)
+- [x] incorporate upgrades 
+    - [ ] (with gold mechanic?)
 - [ ] more error checking
+    - [ ] keep in same channel
 
 ##Later
 - [ ] have opponent accept fight

@@ -5,10 +5,13 @@ from discord.ext import commands
 from tokenfile import TOKEN
 
 
-def findShip(captain):
+def find_ship(captain):
+    index = 0
     for s in ships:
         if s['captain'] == captain:
+            s['position'] = index
             return s
+        index += 1
     return None
 
 
@@ -20,6 +23,8 @@ class Ship:
         self.crews = 10
         self.armor = 10
         self.sails = 10
+
+        self.position = 0
 
     def info(self):
         infostr = "This ship is captained by {4} \nIt has {0} cannons, {1} crew, {2} armor, and {3} sails".\
@@ -38,7 +43,8 @@ class Ship:
         else:
             return "failed"
         return "success"
-    def toJSON(self):
+
+    def to_dict(self):
         return {
             'captain': self.captain,
             'cannons': self.cannons,
@@ -46,6 +52,16 @@ class Ship:
             'armor': self.armor,
             'sails': self.sails
         }
+
+    def from_dict(self,json_data):
+        self.captain = json_data['captain']
+        self.cannons = json_data['cannons']
+        self.crews = json_data['crews']
+        self.armor = json_data['armor']
+        self.sails = json_data['sails']
+
+        self.position = json_data['position']
+
 
 class Pirate:
 
@@ -55,23 +71,29 @@ class Pirate:
 # maybe be safe later
 #    def __unload(self):
 
-
     @commands.command(pass_context=True, no_pm=True)
     async def ship(self, ctx):
         captain = ctx.message.author.name
         """look at ship."""
 
-        myship = findShip(captain)
+        myship_dict = find_ship(captain)
 
-        if not myship:
+        if not myship_dict:
             myship = Ship(captain)
+            ships.append(myship.to_dict())
+            print('appended')
 
-        await self.bot.say('your ship is fucking awesome, here\'s what its got: \n'+ myship.info())
+        else:
+            myship = Ship(captain)
+            myship.from_dict(find_ship(captain))
+            print(myship.upgrade("crews", 10))
+            ships[myship.position] = myship.to_dict()
+            print('upgraded')
 
-        ships.append(myship.toJSON())
-        jsonData = ships
         with open("ship_file.json", "w") as write_file:
-            json.dump(jsonData, write_file)
+            json.dump(ships, write_file)
+
+        await self.bot.say('your ship is fucking awesome, here\'s what its got: \n' + myship.info())
 
     @commands.command(pass_context=True, no_pm=True)
     async def fight(self, ctx):
@@ -104,12 +126,18 @@ bot.add_cog(Pirate(bot))
 async def on_ready():
     print('Logged in as:\n{0} (ID: {0.id})'.format(bot.user))
 
+
+"""reading the ship file to add all the users ships to the dataspace"""
 with open("ship_file.json", "r") as read_file:
     first = read_file.read(1)
     global ships
     ships = []
     if first:
-        ships = json.load(read_file)
+        read_file.seek(0)
+        json_data = json.load(read_file)
+        ships.append(json_data[0])
+
+        print("here are the ships:")
         print(ships)
 
 bot.run(TOKEN)

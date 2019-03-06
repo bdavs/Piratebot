@@ -9,6 +9,7 @@
     - [ ] adding comments to functions creates explanation
 - [x] have overall level to view
 - [ ] more error checking
+    - [ ] function declarations should include default values 
 - [x] comments
 - [ ] make language more piratey
 

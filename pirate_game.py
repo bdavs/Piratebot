@@ -108,7 +108,7 @@ class Pirate:
 #    def __unload(self):
 
     @commands.command(pass_context=True, no_pm=True, hidden=True)
-    async def test(self, ctx, x: int, y: int):
+    async def test(self, ctx, x: int = 0, y: int = 0):
         """for testing only
         currently takes an x and a y and crates an X on the treasure map """
         x = int(x)
@@ -122,7 +122,7 @@ class Pirate:
 
         from PIL import Image, ImageDraw
 
-        im = Image.open("treasure_map.png")
+        im = Image.open("assets/treasure_map.png")
 
         draw = ImageDraw.Draw(im)
 
@@ -157,7 +157,7 @@ class Pirate:
             await self.bot.say('Your ship is fucking awesome, here\'s what its got: \n' + myship.info())
 
     @commands.command(pass_context=True, no_pm=True)
-    async def fight(self, ctx, defender_msg, accept: int):
+    async def fight(self, ctx, defender_msg=None, accept: int = False):
         """starts a fight with someone in chat
         do $fight @victim to attack your victim
         """

@@ -12,7 +12,7 @@
 - [ ] comments
 - [ ] make language more piratey
 
-##Later
+## Later
 - [ ] better fight mechanics
     - [ ] some upgrades move the randint for chance to earn more
 - [ ] better upgrade mechanics
@@ -30,7 +30,7 @@
 - [ ] AWS
 
 
-###Eventually
+### Eventually
 - [ ] fighting steals their gold
 - [ ] ships take damage
     - [ ] sinking a ship means buying new one
@@ -44,7 +44,7 @@
 - [ ] pictures for their ship
 - [ ] emotes
 
-###Future Upgrade Ideas
+### Future Upgrade Ideas
 - different boats
     - dingy
     - skiff

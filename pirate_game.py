@@ -1,9 +1,12 @@
 import discord
+import pprint
 import asyncio
 import json
 import random
 from discord.ext import commands
 from tokenfile import TOKEN
+
+client = discord.Client()
 
 parts = ['cannons', 'crew', 'armor', 'sails']
 parts_print = ', '.join(parts)
@@ -30,19 +33,22 @@ class Ship:
 
     def __init__(self, user):
         self.captain = user
-        self.cannons = 10
-        self.crew = 10
-        self.armor = 10
-        self.sails = 10
+        self.cannons = 5
+        self.crew = 5
+        self.armor = 5
+        self.sails = 5
+
+        self.gold = 0
 
         self.position = 0
 
     def info(self):
-        infostr = "This ship is captained by {4} \nIt has {0} cannons, {1} crew, {2} armor, and {3} sails".\
-            format(self.cannons, self.crew, self.armor, self.sails, self.captain)
+        infostr = "This ship is captained by {4} \nIt has {0} cannons, {1} crew, {2} armor, and {3} sails \n" \
+                  "Its coffers are holding {5} gold".\
+            format(self.cannons, self.crew, self.armor, self.sails, self.captain, self.gold)
         return infostr
 
-    def upgrade(self, parameter, amount):
+    def upgrade(self, parameter, amount, cost=0):
         if parameter == "cannons":
             self.cannons += amount
         elif parameter == "crew":
@@ -53,7 +59,7 @@ class Ship:
             self.sails += amount
         else:
             return False
-
+        self.gold -= cost
         ships[self.position] = self.to_dict()
         write_json_file()
         return True
@@ -64,7 +70,8 @@ class Ship:
             'cannons': self.cannons,
             'crew': self.crew,
             'armor': self.armor,
-            'sails': self.sails
+            'sails': self.sails,
+            'gold': self.gold
         }
 
     def from_dict(self, json_data):
@@ -77,12 +84,15 @@ class Ship:
         self.crew = json_data['crew']
         self.armor = json_data['armor']
         self.sails = json_data['sails']
+        self.gold = json_data['gold']
 
+        # should this be here?
         self.position = json_data['position']
 
 
-class Pirate:
 
+class Pirate:
+    """These are the pirate commands"""
     def __init__(self, bot):
         self.bot = bot
 
@@ -90,9 +100,15 @@ class Pirate:
 #    def __unload(self):
 
     @commands.command(pass_context=True, no_pm=True)
+    async def test(self, ctx):
+        """for testing only"""
+
+        print(list(client.get_all_emojis()))
+
+    @commands.command(pass_context=True, no_pm=True)
     async def ship(self, ctx):
+        """look at your ship's info or create one if you're new"""
         captain = ctx.message.author.name
-        """look at ship."""
 
         myship = find_ship(captain)
 
@@ -100,14 +116,16 @@ class Pirate:
             myship = Ship(captain)
             ships.append(myship.to_dict())
             write_json_file()
-            await self.bot.say('Congratulations on the new ship captain! Here is what she\'s got: \n' + myship.info())
+            await self.bot.say('Congratulations on the new ship, Captain! Here is what she\'s got: \n' + myship.info())
         else:
-            await self.bot.say('your ship is fucking awesome, here\'s what its got: \n' + myship.info())
+            await self.bot.say('Your ship is fucking awesome, here\'s what its got: \n' + myship.info())
 
 
     @commands.command(pass_context=True, no_pm=True)
     async def fight(self, ctx):
-        """starts a fight with someone in chat"""
+        """starts a fight with someone in chat
+        do $fight @victim to attack your victim
+        """
         attacker = ctx.message.author.name
         defenders = ctx.message.mentions
         if not defenders:
@@ -118,7 +136,7 @@ class Pirate:
             return
         else:
             defender = defenders[0].name
-            await self.bot.say('{0} has attacked {1}'.format(attacker, defender))
+
 
             attacker_ship = find_ship(attacker)
             if not attacker_ship:
@@ -131,6 +149,8 @@ class Pirate:
                                    ' on the high sea if there are no ships to fight'.format(defender))
                 return
 
+            await self.bot.say('{0} has attacked {1} :rage: :zedd: '.format(attacker, defender))
+
             attack = random.randint(1, 100)
             attack += attacker_ship.cannons + attacker_ship.crew
             attack -= defender_ship.armor + defender_ship.sails
@@ -139,17 +159,22 @@ class Pirate:
             defense += defender_ship.cannons + defender_ship.crew
             defense -= attacker_ship.armor + attacker_ship.sails
 
+            gold = 100
             if attack > defense:
                 winner = attacker
+                attacker_ship.gold += gold
+                await self.bot.say('{0} shot {2} cannonballs and {1} shot {3}.'
+                                   ' {4} is the winner! and earned {5} gold for '
+                                   'their coffers'.format(attacker, defender, attack, defense, winner, gold))
             else:
                 winner = defender
-
-            await self.bot.say('{0} shot {2} cannonballs and {1} shot {3}.'
-                               ' {4} is the winner!'.format(attacker, defender, attack, defense, winner))
+                await self.bot.say('{0} shot {2} cannonballs and {1} shot {3}.'
+                                   ' {4} is the winner! Their ship survives to fight '
+                                   'another day.'.format(attacker, defender, attack, defense, winner))
 
     @commands.command(pass_context=True, no_pm=True)
     async def upgrade(self, ctx):
-        """upgrade your ship"""
+        """Upgade your ship"""
         user = ctx.message.author.name
         user_ship = find_ship(user)
         if not user_ship:
@@ -165,6 +190,10 @@ class Pirate:
         def part_check(m):
             return m.content in parts
 
+        def y_n_check(m):
+            msg = m.content.lower()
+            return msg == 'yes' or msg == 'y' or msg == 'no' or msg == 'n'
+
         part_msg = await bot.wait_for_message(timeout=30.0, author=ctx.message.author, check=part_check)
         if part_msg is None:
             fmt = 'Sorry, you took too long.'
@@ -172,8 +201,11 @@ class Pirate:
             return
 
         part = part_msg.content
+        user_dict = user_ship.to_dict()
+
         await bot.send_message(ctx.message.channel,
-                               'Okay, how much would you like to upgrade {} by?'.format(part))
+                               'Okay, how much would you like to upgrade {} by? '
+                               'It is currently level {}'.format(part, user_dict[part]))
 
         amount_msg = await bot.wait_for_message(timeout=30.0, author=ctx.message.author, check=int_check)
         if amount_msg is None:
@@ -182,17 +214,39 @@ class Pirate:
             return
 
         amount = int(amount_msg.content)
-        user_ship.upgrade(part, amount)
+
+        cost = int(amount * 10 + (user_dict[part] + amount) / 10)
+        if cost > user_ship.gold:
+            await bot.send_message(ctx.message.channel,
+                                   'Upgrading {} by {} will cost {}. You only have {} gold. '
+                                   'Win some fights to earn more gold.'.format(part, amount, cost, user_ship.gold))
+            return
 
         await bot.send_message(ctx.message.channel,
-                               'Congrats here is your new ship: {}'.format(user_ship.info()))
+                               'Upgrading {} by {} will cost {}. You have {} gold, would you like to continue? '
+                               '\'yes\' or \'no\''.format(part, amount, cost, user_ship.gold))
+        continue_msg = await bot.wait_for_message(timeout=30.0, author=ctx.message.author, check=y_n_check)
+        if continue_msg is None:
+            fmt = 'Sorry, you took too long.'
+            await bot.send_message(ctx.message.channel, fmt)
+            return
+
+        msg = continue_msg.content.lower()
+        if msg == 'no' or msg == 'n':
+            return
+
+        user_ship.upgrade(part, amount, cost)
+        await bot.send_message(ctx.message.channel,
+                               'Congrats here is your new upgrades: {}'.format(user_ship.info()))
 
 
-bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description='a pirate ship bot')
+description = 'A pirate ship bot. Lets you fight other users and upgrade your ship. Sail on captain! \n Prefix is $'
+bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description=description)
 bot.add_cog(Pirate(bot))
 
 @bot.event
 async def on_ready():
+    await bot.change_presence(game=discord.Game(name='Sailing the High Seas | $help'))
     print('Logged in as:\n{0} (ID: {0.id})'.format(bot.user))
 
 @bot.check
@@ -211,6 +265,6 @@ with open("ship_file.json", "r") as read_file:
             ships.append(s)
 
         print("here are the ships:")
-        print(ships)
+        pprint.pprint(ships)
 
 bot.run(TOKEN)

@@ -5,17 +5,19 @@
 - [x] create way to store gold (fights win you gold)
 - [x] incorporate upgrades 
     - [x] (with gold mechanic?)
-- [ ] help command
+- [x] help command
     - [ ] adding comments to functions creates explanation
-- [ ] have overall level to view
+- [x] have overall level to view
 - [ ] more error checking
-- [ ] comments
+- [x] comments
 - [ ] make language more piratey
 
 ## Later
 - [ ] better fight mechanics
     - [ ] some upgrades move the randint for chance to earn more
 - [ ] better upgrade mechanics
+- [ ] better leveling mechanic
+- [ ] win-loss records
 - [ ] earn more gold against harder enemies
 - [ ] lose gold for losing fight
 - [ ] have opponent accept fight
@@ -43,6 +45,7 @@
 - [ ] dailies
 - [ ] pictures for their ship
 - [ ] emotes
+- [ ] draw treasure map
 
 ### Future Upgrade Ideas
 - different boats

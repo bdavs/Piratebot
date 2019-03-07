@@ -6,12 +6,13 @@
 - [x] incorporate upgrades 
     - [x] (with gold mechanic?)
 - [x] help command
-    - [ ] adding comments to functions creates explanation
+    - [x] adding comments to functions creates explanation
 - [x] have overall level to view
 - [ ] more error checking
     - [ ] function declarations should include default values 
 - [x] comments
 - [ ] make language more piratey
+
 
 ## Later
 - [ ] better fight mechanics
@@ -19,7 +20,7 @@
 - [ ] better upgrade mechanics
 - [ ] better leveling mechanic
 - [ ] win-loss records
-- [ ] earn more gold against harder enemies
+- [x] earn more gold against harder enemies
 - [ ] lose gold for losing fight
 - [ ] have opponent accept fight
 - [ ] more parameters
@@ -27,9 +28,11 @@
 - [ ] naming their ships
 - [ ] play-testing
 - [ ] smoother experience (delete posts? add users name to each post? different formatting?)
+    - [ ] upgrades should list costs more clearly
 - [ ] even more error checking
     - [ ] keep in same channel
 - [ ] position shouldn't be in json
+- [ ] json should include unique id for user
 - [ ] AWS
 
 
@@ -45,6 +48,7 @@
     - [ ] 2 v 1
 - [ ] dailies
 - [ ] pictures for their ship
+- [ ] upgrade to discord.py 1.0
 - [ ] emotes
 - [ ] draw treasure map
 

@@ -3,7 +3,7 @@ A pirate ship bot. Lets you fight other users and upgrade your ship. Sail on cap
 
 ## Installation
 
-PirateBot was created on python 3.6. no other versions were tested
+PirateBot was created on python 3.6. no other versions were tested (3.7 is definitely broken)
 
 ### discord.py
 PirateBot relies on discord.py, an API wrapper for Discord written in Python. 

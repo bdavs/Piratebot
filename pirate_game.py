@@ -116,33 +116,38 @@ class Pirate:
         self.bot = bot
 
     @commands.command(pass_context=True, no_pm=True, hidden=True)
-    async def test2(self, ctx):
+    async def test2(self, ctx, user=None):
 
-        await self.bot.say("hello " + ctx.message.author.mention + "   <:zedd:497988656041164811>")
+        await bot.send_typing(ctx.message.channel)
+        em = discord.Embed(title='My Embed Title', description='My Embed Content.', colour=0xDEADBF)
+        em.set_author(name=ctx.message.author.name, icon_url=ctx.message.author.avatar_url)
+        em_msg = await bot.send_message(ctx.message.channel, embed=em)
 
+        em.add_field(name="Field1", value="hi <:pirateThink:550815188119715840>", inline=False)
+        em.add_field(name="Field2", value="hi2", inline=True)
+        em.add_field(name="Field3", value="hi3", inline=True)
 
-        for emoji in self.bot.get_all_emojis():
-            print(emoji.id, emoji.name)
-            if emoji.id == '497988656041164811':
-                return await self.bot.add_reaction(ctx.message, emoji)
-           # discord.emoji.Emoji(i)
-        """
-        if ':cry:' in ctx.message.content:
-            emoji = discord.utils.get(self.bot.get_all_emojis(), name='sob')
-            print(emoji)
-            await self.bot.add_reaction(ctx.message, emoji)
-        """
-        # discord.utils.get()
-        # print(list(self.bot.get_all_emojis()))
+        await self.bot.edit_message(em_msg, embed=em)
 
         """
-        if ctx.message.content.find(':cry:'):
-            for x in client.get_all_emojis():
-                if x.id == '#EmojiID#':
-                    return await client.add_reaction(ctx.message, x)
+        defenders = ctx.message.mentions
+        # only continue if valid attacker and defender
+        if not defenders:
+            await self.bot.say('Who are you fighting?')
+            return
+        elif len(defenders) > 1:
+            await self.bot.say('Who are you fighting? One at a time (for now)')
+            return
+        else:
+            defender = defenders[0].name
+
+            defender_ship = find_ship(defender)
+            if not defender_ship:
+                await self.bot.say('{0} does not have a ship! '.format(defender))
+                return
         """
 
-        # await self.bot.say("hello " + ctx.message.author.mention)
+
 
     @commands.command(pass_context=True, no_pm=True, hidden=True)
     async def test(self, ctx, x: int = 0, y: int = 0):
@@ -191,11 +196,11 @@ class Pirate:
                                'Here is what she\'s got: \n {} \n Cannons and Crew contribute to your attack,'
                                ' while Armor and Sails contribute to defense```'.format(user_ship.info()))
         else:
-            await self.bot.say('```Your ship is pretty awesome, here\'s what she\'s '
+            await self.bot.say('``` \nYour ship is pretty awesome, here\'s what she\'s '
                                'got: \n{}```'.format(user_ship.info()))
 
     @commands.command(pass_context=True, no_pm=True)
-    async def fight(self, ctx, defender_msg=None, accept: int = False):
+    async def fight(self, ctx):
         """starts a fight with someone in chat
         do $fight @victim to attack your victim
         """
@@ -203,7 +208,7 @@ class Pirate:
         defenders = ctx.message.mentions
         # only continue if valid attacker and defender
         if not defenders:
-            await self.bot.say('Who are you fighting?')
+            await self.bot.say('Who are you fighting? @user to fight someone')
             return
         elif len(defenders) > 1:
             await self.bot.say('Who are you fighting? One at a time (for now)')

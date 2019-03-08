@@ -9,10 +9,11 @@
     - [x] adding comments to functions creates explanation
 - [x] have overall level to view
 - [ ] more error checking
-    - [ ] function declarations should include default values 
+    - [x] function declarations should include default values 
 - [x] comments
 - [ ] make language more piratey
 - [ ] new lines per parameter
+- [ ] embedify like everything 
 
 
 ## Later
@@ -21,6 +22,7 @@
 - [ ] better upgrade mechanics
 - [ ] better leveling mechanic
 - [ ] win-loss records
+- [ ] ship command should show mentioned ship as well
 - [x] earn more gold against harder enemies
 - [ ] lose gold for losing fight
 - [ ] have opponent accept fight

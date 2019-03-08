@@ -208,7 +208,7 @@ class Pirate:
         defenders = ctx.message.mentions
         # only continue if valid attacker and defender
         if not defenders:
-            await self.bot.say('Who are you fighting? @user to fight someone')
+            await self.bot.say('Who are you fighting? $fight @user to fight someone')
             return
         elif len(defenders) > 1:
             await self.bot.say('Who are you fighting? One at a time (for now)')

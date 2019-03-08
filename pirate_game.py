@@ -57,7 +57,7 @@ class Ship:
 
     def level(self):
         """returns level of ship based on its primary features"""
-        ship_level = self.cannons + self.crew + self.armor + self.sails
+        ship_level = int((self.cannons + self.crew + self.armor + self.sails) / 5) - 3
         return int(ship_level)
 
     def upgrade(self, parameter, amount, cost=0):
@@ -222,7 +222,8 @@ class Pirate:
                                    ' on the high sea if there are no ships to fight'.format(defender))
                 return
 
-            await self.bot.say('{0} has attacked {1} :rage: '.format(attacker, defender))
+            msg_txt = '{0} has attacked {1} :rage: '.format(attacker, defender)
+            msg = await self.bot.say(msg_txt)
 
             # calculate who wins based on their attack and defense plus random number
             attacker_ship.repair_hull()
@@ -240,9 +241,9 @@ class Pirate:
                 defender_ship.damage_hull(attack)
                 attacker_ship.damage_hull(defense)
 
-                await self.bot.say('{0} fired a volley of cannonballs dealing {2} damage! '
-                                   '{1} returned fire dealing {3} damage!'
-                                   ''.format(attacker, defender, attack, defense))
+                msg_txt += '\n{0} fired a volley of cannonballs dealing {2} damage! {1} returned fire dealing {3} ' \
+                           'damage!'.format(attacker, defender, attack, defense)
+                await self.bot.edit_message(msg, msg_txt)
 
             if attacker_ship.hull > defender_ship.hull:
                 winner = attacker
@@ -250,12 +251,14 @@ class Pirate:
                 gold = 100 + (defender_ship.level() - attacker_ship.level())
                 attacker_ship.gold += gold
                 update(attacker_ship)
-                await self.bot.say(' {} is the winner! and earned {} gold for '
-                                   'their coffers'.format(winner, gold))
+                msg_txt += '\n{} is the winner! :crossed_swords: and earned {} gold for '\
+                           'their coffers'.format(winner, gold)
+                await self.bot.edit_message(msg, msg_txt)
             else:
                 winner = defender
-                await self.bot.say('{} is the winner! Their ship survives to fight '
-                                   'another day.'.format(winner))
+                msg_txt += '\n{} is the winner! :shield:  Their ship survives to fight '\
+                           'another day. '.format(winner)
+                await self.bot.edit_message(msg, msg_txt)
 
             # reset hulls just in case
             attacker_ship.repair_hull()

@@ -12,10 +12,11 @@
     - [ ] function declarations should include default values 
 - [x] comments
 - [ ] make language more piratey
+- [ ] new lines per parameter
 
 
 ## Later
-- [ ] better fight mechanics
+- [x] better fight mechanics
     - [ ] some upgrades move the randint for chance to earn more
 - [ ] better upgrade mechanics
 - [ ] better leveling mechanic

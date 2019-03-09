@@ -81,3 +81,13 @@
     - rigging
     - oarmen
     - gunpowder
+    
+ ```
+upgrade mechanic is confusing
+double posting when started twice
+you can fight yourself
+too easy to upgrade
+add @ to each message?
+alias $battle to $fight
+
+```

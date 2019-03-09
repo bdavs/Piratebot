@@ -193,10 +193,10 @@ class Pirate:
             ships.append(user_ship.to_dict())
             write_json_file()
             await self.bot.say('```Congratulations on the new ship, Captain! Welcome aboard!'
-                               'Here is what she\'s got: \n {} \n Cannons and Crew contribute to your attack,'
+                               'Here is what she\'s got: \n\n{} \n\nCannons and Crew contribute to your attack,'
                                ' while Armor and Sails contribute to defense```'.format(user_ship.info()))
         else:
-            await self.bot.say('``` \nYour ship is pretty awesome, here\'s what she\'s '
+            await self.bot.say('``` Your ship is pretty awesome, here\'s what she\'s '
                                'got: \n{}```'.format(user_ship.info()))
 
     @commands.command(pass_context=True, no_pm=True)
@@ -208,7 +208,7 @@ class Pirate:
         defenders = ctx.message.mentions
         # only continue if valid attacker and defender
         if not defenders:
-            await self.bot.say('Who are you fighting? $fight @user to fight someone')
+            await self.bot.say('Who are you fighting? `$fight @user` to fight someone')
             return
         elif len(defenders) > 1:
             await self.bot.say('Who are you fighting? One at a time (for now)')

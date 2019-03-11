@@ -19,6 +19,7 @@
 ## Later
 - [x] better fight mechanics
     - [ ] some upgrades move the randint for chance to earn more
+    - [ ] add a dodge chance?
 - [ ] better upgrade mechanics
 - [ ] better leveling mechanic
 - [ ] win-loss records
@@ -85,15 +86,14 @@
     
     
 ## known problems
- ```
-upgrade mechanic is confusing
-double posting when started twice
-you can fight yourself
-too easy to upgrade
-add @ to each message? maybe just **name**
-alias $battle to $fight
-alternative gold sources
-lose crew after fights?
-must stay in port for x time after upgrades?
-morale system as alternative cooldown and lowered damage
-```
+
+- [x] upgrade mechanic is confusing
+- [ ] double posting when started twice
+- [x] you can fight yourself
+- [x] too easy to upgrade
+- [ ] add @ to each message? maybe just **name**
+- [x] alias $battle to $fight
+- [ ] alternative gold sources
+- [ ] lose crew after fights?
+- [ ] must stay in port for x time after upgrades?
+- [ ] morale system as alternative cooldown and lowered damage

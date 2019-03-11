@@ -1,123 +1,29 @@
 DEV = True
 import discord
 
-import json
 import random
 from discord.ext import commands
+from Ship import Ship, update, find_ship
 if DEV:
     from dev_tokenfile import TOKEN
     COOLDOWN = 1
+    from Testing import Testing
 else:
     from tokenfile import TOKEN
     COOLDOWN = 30
 
 client = discord.Client()
 
-parts = ['cannons', 'crew', 'armor', 'sails']
-parts_print = '\n'.join(parts)
+parts = ['Cannons', 'Crew', 'Armor', 'Sails']
+parts_emotes = ['<a:cannon:554558216889958400> Cannons', '<a:crew:554559291609055242> Crew',
+                '<a:armor:554559559545520128> Armor', ' <a:sails:554558739747831808> Sails']
+parts_print = '\n'.join(parts_emotes)
 
 
-def write_json_file():
-    with open("ship_file.json", "w") as write_file:
-        json.dump(ships, write_file)
 
 
-def update(ship):
-    ships[ship.position] = ship.to_dict()
-    write_json_file()
-
-
-def find_ship(captain):
-    """returns the ship based on captain from ships variable"""
-    index = 0
-    for s in ships:
-        if s['captain'] == captain:
-            s['position'] = index
-            temp_ship = Ship(captain)
-            temp_ship.from_dict(s)
-            return temp_ship
-        index += 1
-    return None
-
-
-class Ship:
-    """defines a single instance of a ship"""
-    def __init__(self, user):
-        self.captain = user
-        self.cannons = 5
-        self.crew = 5
-        self.armor = 5
-        self.sails = 5
-        self.hull = 110
-
-        self.gold = 0
-
-        self.position = 0
-
-    def info(self):
-        """returns a str with basic parameters of the ship"""
-
-        infostr = '\n'.join([str(self.cannons), str(self.crew), str(self.armor), str(self.sails)])
-        """
-                infostr = "This level {6} ship is captained by {4} \nIt has {0} cannons, {1} crew, {2} armor, and {3} sails \n"\
-                  "Its coffers are holding {5} gold".\
-            format(self.cannons, self.crew, self.armor, self.sails, self.captain, self.gold, self.level())
-            """
-        return infostr
-
-    def level(self):
-        """returns level of ship based on its primary features"""
-        ship_level = int((self.cannons + self.crew + self.armor + self.sails) / 5) - 3
-        return int(ship_level)
-
-    def upgrade(self, parameter, amount, cost=0):
-        """updates the parameters of the ship and subtracts the cost"""
-        if parameter == "cannons":
-            self.cannons += amount
-        elif parameter == "crew":
-            self.crew += amount
-        elif parameter == "armor":
-            self.armor += amount
-        elif parameter == "sails":
-            self.sails += amount
-        else:
-            return False
-
-        self.gold -= cost
-        update(self)
-        return True
-
-    def repair_hull(self):
-        self.hull = 100 + self.armor + self.sails
-
-    def damage_hull(self,damage):
-        self.hull -= damage
-
-    def to_dict(self):
-        """creates a dict from ship params"""
-        return {
-            'captain': self.captain,
-            'cannons': self.cannons,
-            'crew': self.crew,
-            'armor': self.armor,
-            'sails': self.sails,
-            'gold': self.gold
-        }
-
-    def from_dict(self, json_data=None):
-        """creates a ship based on a dict"""
-        if json_data is None:
-            return None
-
-        self.captain = json_data['captain']
-        self.cannons = json_data['cannons']
-        self.crew = json_data['crew']
-        self.armor = json_data['armor']
-        self.sails = json_data['sails']
-        self.gold = json_data['gold']
-
-        # should this be here?
-        self.position = json_data['position']
+def calc_upgrade(part, amount=1):
+    return sum([int(100 + float(((part + temp_amount) ** 1.2) * 20)) for temp_amount in range(amount, 0, -1)])
 
 
 class Pirate(commands.Cog):
@@ -125,113 +31,32 @@ class Pirate(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(pass_context=True, no_pm=True, hidden=True)
-    @commands.cooldown(1, COOLDOWN, commands.BucketType.user)
-    async def test2(self, ctx, user=None):
-
-        print(self.bot.emojis)
-        #await ctx.send_typing(ctx.message.channel)
-        em = discord.Embed(title='My Embed Title', description='My Embed Content.', colour=0xDD0000)
-        em.set_author(name=ctx.message.author.name, icon_url=ctx.message.author.avatar_url)
-
-        em.add_field(name="Ship Level", value="x", inline=False)
-        em.add_field(name="Field2", value="hi2", inline=True)
-        em.add_field(name="Field3", value="hi3", inline=True)
-        em_msg = await ctx.send(ctx.message.channel, embed=em)
-#        await em_msg.edit(embed=em)
-
-        await ctx.send("<:pirateThink:550815188119715840>")
-
-        """
-        hi <:pirateThink:550815188119715840>
-        defenders = ctx.message.mentions
-        # only continue if valid attacker and defender
-        if not defenders:
-            await ctx.send('Who are you fighting?')
-            return
-        elif len(defenders) > 1:
-            await ctx.send('Who are you fighting? One at a time (for now)')
-            return
-        else:
-            defender = defenders[0].name
-
-            defender_ship = find_ship(defender)
-            if not defender_ship:
-                await ctx.send('{0} does not have a ship! '.format(defender))
-                return
-        """
 
 
-
-    @commands.command(pass_context=True, no_pm=True, hidden=True)
-    @commands.cooldown(1, COOLDOWN, commands.BucketType.user)
-    async def test(self, ctx, x: int = 0, y: int = 0):
-        """for testing only
-        currently takes an x and a y and crates an X on the treasure map """
-        x = int(x)
-        y = int(y)
-
-        # tune size for length of crosses in X
-        size = 25
-
-        # tune width for thickness of X
-        width = 20
-
-        from PIL import Image, ImageDraw
-
-        im = Image.open("assets/treasure_map.png")
-
-        draw = ImageDraw.Draw(im)
-
-        draw.line([(x-size, y-size), (x+size, y+size)], fill=(128, 0, 0), width=width)
-        draw.line([(x+size, y-size), (x-size, y+size)], fill=(128, 0, 0), width=width)
-
-        del draw
-
-        im.save("marked_treasure_map.png", "PNG")
-
-        await ctx.send(ctx.message.channel, 'marked_treasure_map.png')
-
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=True, aliases=['info'])
     @commands.cooldown(1, COOLDOWN, commands.BucketType.user)
     async def ship(self, ctx):
         """look at your ship's info or create one if you're new"""
         captain = ctx.message.author.name
-
         user_ship = find_ship(captain)
 
         if not user_ship:
             user_ship = Ship(captain)
-            ships.append(user_ship.to_dict())
-            write_json_file()
-            em = discord.Embed(title='My Embed Title', description='My Embed Content.', colour=0xDD0000)
-            await ctx.send('```Congratulations on the new ship, Captain! Welcome aboard!'
-                               'Here is what she\'s got: \n\n{} \n\nCannons and Crew contribute to your attack,'
-                               ' while Armor and Sails contribute to defense```'.format(user_ship.info()))
-        else:
-            """
-            < Emoji
-            id = 554558216889958400
-            name = ':cannon:' >, < Emoji
-            id = 554558739747831808
-            name = 'sails' >, < Emoji
-            id = 554559291609055242
-            name = 'crew' >, < Emoji
-            id = 554559559545520128
-            name = 'armor' >]
-            """
-            em = discord.Embed(title='Ship Level', description=str(user_ship.level()), colour=0xDD0000)
-            em.set_author(name=ctx.message.author.name + '\'s Ship', icon_url=ctx.message.author.avatar_url)
+            update(user_ship, is_new=True)
 
-            #em.add_field(name="Ship Level", value=str(user_ship.level()), inline=False)
+            await ctx.send('Congratulations on the new ship, Captain {}! Welcome aboard!'
+                           '\nCannons and Crew contribute to your attack,'
+                           ' while Armor and Sails contribute to defense\nHere\'s what she\'s got:'.format(captain))
 
-            em.add_field(name="__Part__", value=parts_print.title(), inline=True)
-           # em.add_field(name="emoji", value="<:pirateThink:550815188119715840> :sob:", inline=True)
-            em.add_field(name="__Level__ <a:cannon:554558216889958400>", value=user_ship.info(), inline=True)
-            em.set_footer(text="Your ships coffers hold {} gold ".format(user_ship.gold))
-            em_msg = await ctx.send(embed=em)
+        em = discord.Embed(title='Ship Level', description=str(user_ship.level()), colour=0xDD0000)
+        em.set_author(name=ctx.message.author.name + '\'s Ship', icon_url=ctx.message.author.avatar_url)
+        em.add_field(name="__Part__", value=parts_print, inline=True)
+        em.add_field(name="__Level__", value=user_ship.info(), inline=True)
+        em.set_footer(text="Your ship's coffers hold {} gold".format(user_ship.gold),
+                      icon_url="https://cdn.discordapp.com/emojis/554730061463289857.gif")
+        em_msg = await ctx.send(embed=em)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=True, aliases=['battle', 'attack'])
     @commands.cooldown(1, COOLDOWN, commands.BucketType.user)
     async def fight(self, ctx):
         """starts a fight with someone in chat
@@ -240,6 +65,10 @@ class Pirate(commands.Cog):
         attacker = ctx.message.author.name
         defenders = ctx.message.mentions
         # only continue if valid attacker and defender
+        attacker_ship = find_ship(attacker)
+        if not attacker_ship:
+            await ctx.send('{0}, you do not have a ship! `$ship` to get one'.format(ctx.message.author.mention))
+            return
         if not defenders:
             await ctx.send('Who are you fighting? `$fight @user` to fight someone')
             return
@@ -249,15 +78,11 @@ class Pirate(commands.Cog):
         else:
             defender = defenders[0].name
 
-            attacker_ship = find_ship(attacker)
-            if not attacker_ship:
-                await ctx.send('{0} does not have a ship! $ship to get one'.format(attacker))
-                return
-
             if attacker == defender:
                 attacker_ship.gold -= 50
                 if attacker_ship.gold < 0:
                     attacker_ship.gold = 0
+                update(attacker_ship)
                 await ctx.send('A mutiny has started on {0}\'s ship! The treasure hold has been ransacked! '
                                    '{1} gold was taken.'.format(defender, 50))
                 return
@@ -268,13 +93,14 @@ class Pirate(commands.Cog):
                                    ' on the high sea if there are no ships to fight'.format(defender))
                 return
 
-            msg_txt = '{0} has attacked {1} :rage: '.format(attacker, defender)
-            msg = await ctx.send(msg_txt)
+            #actually start fight
+            em = discord.Embed(title='{0} has attacked {1} :rage: '.format(attacker, defender),  colour=0xDDDD00)
 
             # calculate who wins based on their attack and defense plus random number
             attacker_ship.repair_hull()
             defender_ship.repair_hull()
-
+            attacker_msg = ''
+            defender_msg = ''
             while attacker_ship.hull > 0 and defender_ship.hull > 0:
                 attack = random.randint(1, 100)
                 attack += attacker_ship.cannons + attacker_ship.crew
@@ -287,104 +113,134 @@ class Pirate(commands.Cog):
                 defender_ship.damage_hull(attack)
                 attacker_ship.damage_hull(defense)
 
-                msg_txt += '\n{0} fired a volley of cannonballs dealing {2} damage! {1} returned fire dealing {3} damage!'.format(attacker, defender, attack, defense)
-                await msg.edit(msg_txt)
+                attacker_msg +=  'Fired a volley of **{}** cannonballs <a:cannon:554558216889958400> \n'.format(attack)
+                defender_msg += '<a:cannon_reversed:554722119905181735> Returned fired a volley of **{}** cannonballs \n'.format(defense)
+                # msg_txt += '\n{0} fired a volley of cannonballs dealing {2} damage! {1} returned fire dealing {3} damage!'.format(attacker, defender, attack, defense)
+
+            em.add_field(name="__{}__".format(attacker), value=attacker_msg, inline=True)
+            em.add_field(name="__{}__".format(defender), value=defender_msg, inline=True)
 
             if attacker_ship.hull > defender_ship.hull:
-                winner = attacker
+
                 # base gold at 100, more gold earned for harder fights, less or easier ones
-                gold = 100 + (defender_ship.level() - attacker_ship.level())
+                gold = 100 + (defender_ship.level() - attacker_ship.level()) * 2
+                gold = gold if gold > 0 else 0
                 attacker_ship.gold += gold
                 update(attacker_ship)
-                msg_txt += '\n{} is the winner! :crossed_swords: and earned {} gold for '\
-                           'their coffers'.format(winner, gold)
-                await msg.edit(msg_txt)
+
+                em.add_field(name='{} is the winner! :crossed_swords:'.format(attacker),
+                             value='<a:treasure_chest:554730061463289857> They earned **{}** gold for their coffers.'.format(gold), inline=False)
+
             else:
-                winner = defender
-                msg_txt += '\n{} is the winner! :shield:  Their ship survives to fight '\
-                           'another day. '.format(winner)
-                await msg.edit(msg_txt)
+                em.add_field(name='{} is the winner! :shield:'.format(defender),
+                             value=' <a:armor:554559559545520128> Their ship survives to fight another day.', inline=False)
+
+            await ctx.send(embed=em)
 
             # reset hulls just in case
             attacker_ship.repair_hull()
             defender_ship.repair_hull()
 
-
     @commands.command(pass_context=True, no_pm=True)
-    @commands.cooldown(1, COOLDOWN, commands.BucketType.user)
-    async def upgrade(self, ctx):
+    @commands.cooldown(1, 30, commands.BucketType.user)
+    async def upgrade(self, ctx, part: str=None, amount=None):
         """Upgrade your ship"""
         user = ctx.message.author.name
         user_ship = find_ship(user)
         if not user_ship:
-            await ctx.send('{0}, you do not have a ship to upgrade! Type \'{1}\' to get one.'.format(user, '$ship'))
+            await ctx.send('{0}, you do not have a ship to upgrade! Type `$ship` to get one.'.format(ctx.message.author.mention))
             return
 
         # these checks will ignore any invalid responses
-        def int_check(m):
-            return m.content.isdigit()
+        def int_or_max_check(m):
+            if m.content.isdigit() or m.content.lower() == 'max':
+                return True
+            else:
+                return False
 
         def part_check(m):
-            return m.content in parts
+            return m.content.lower() in map(str.lower, parts)
 
         def y_n_check(m):
             msg = m.content.lower()
             return msg == 'yes' or msg == 'y' or msg == 'no' or msg == 'n'
 
-        await ctx.send(ctx.message.channel,
-                               '```What part would you like to upgrade? '
-                               'acceptable parameters are {}```'.format(parts_print))
-
-        part_msg = await ctx.wait_for_message(timeout=30.0, author=ctx.message.author, check=part_check)
-        if part_msg is None:
-            fmt = 'Sorry, you took too long.'
-            await ctx.send(ctx.message.channel, fmt)
+        if not part:
+            em = discord.Embed(title='Ship Upgrades', description=str("currently level: " + str(user_ship.level())), colour=0xDD0000)
+            em.set_author(name=ctx.message.author.name + '\'s Ship has docked in the port', icon_url=ctx.message.author.avatar_url)
+            em.add_field(name="__Part__", value=parts_print, inline=True)
+            em.add_field(name="__Current Level__", value=user_ship.info(), inline=True)
+            em.add_field(name="__Next Upgrade Costs__", value=user_ship.upgrade_costs(), inline=True)
+            em.add_field(name="To upgrade: `$upgrade part`", value="you can also say `$upgrade part amount` or `$upgrade part max` to upgrade multiple levels", inline=False)
+            em.set_footer(text="Your ship's coffers hold {} gold".format(user_ship.gold),
+                          icon_url="https://cdn.discordapp.com/emojis/554730061463289857.gif")
+            em_msg = await ctx.send(embed=em)
             return
 
-        part = part_msg.content
+        part = part.lower()
+        if part not in map(str.lower, parts):
+            await ctx.send('Sorry, that\'s not an upgradable part. What part would you like to upgrade? Acceptable parameters are:\n{}'.format(parts_print))
+            return
+
         user_dict = user_ship.to_dict()
 
-        await ctx.send(ctx.message.channel,
-                               '```Okay, how much would you like to upgrade {} by? \n'
-                               'It is currently level {}```'.format(part, user_dict[part]))
+        if not amount:
 
-        amount_msg = await ctx.wait_for_message(timeout=30.0, author=ctx.message.author, check=int_check)
-        if amount_msg is None:
-            fmt = 'Sorry, you took too long.'
-            await ctx.send(ctx.message.channel, fmt)
-            return
+            # only upgrade by 1
+            cost = calc_upgrade(user_dict[part])
+                #int(100 + float((user_dict[part] ** 1.2) * 20))
+            amount = 1
 
-        amount = int(amount_msg.content)
+        else:
+            if amount.isdigit():
+                amount = int(amount)
+                cost = calc_upgrade(user_dict[part], amount)
+                await ctx.send('AMOUNT INCLUDED Upgrading {} by {} will cost {}. You only have {} gold. '
+                               'Win some fights to earn more gold.'.format(part, amount, cost, user_ship.gold))
+            elif amount.lower() == 'max':
+                cost = 0
+                amount = 0
+                while cost < user_ship.gold:
+                    amount += 1
+                    cost = calc_upgrade(user_dict[part], amount)
 
-        cost = int(amount * 10 + (user_dict[part] + amount) / 10)
+                #stop overdrafting gold
+                amount -= 1
+                cost = calc_upgrade(user_dict[part], amount)
+
+                if amount == 0:
+                    amount = 1
+                    cost = calc_upgrade(user_dict[part], amount)
+                    await ctx.send('Upgrading {} by {} will cost {}. You only have {} gold. '
+                                   'Win some fights to earn more gold.'.format(part, amount, cost, user_ship.gold))
+                    return
+
+
+#        cost = int(amount * 10 + (user_dict[part] + amount) / 10)
         if cost > user_ship.gold:
-            await ctx.send(ctx.message.channel,
-                                   '```Upgrading {} by {} will cost {}. You only have {} gold. '
-                                   'Win some fights to earn more gold.```'.format(part, amount, cost, user_ship.gold))
-            return
-
-        await ctx.send(ctx.message.channel,
-                               '```Upgrading {} by {} will cost {}. You have {} gold, would you like to continue? '
-                               '\'yes\' or \'no\'```'.format(part, amount, cost, user_ship.gold))
-        continue_msg = await ctx.wait_for_message(timeout=30.0, author=ctx.message.author, check=y_n_check)
-        if continue_msg is None:
-            fmt = 'Sorry, you took too long.'
-            await ctx.send(ctx.message.channel, fmt)
-            return
-
-        msg = continue_msg.content.lower()
-        if msg == 'no' or msg == 'n':
+            await ctx.send('Upgrading {} by {} will cost {}. You only have {} gold. '
+                           'Win some fights to earn more gold.'.format(part, amount, cost, user_ship.gold))
             return
 
         user_ship.upgrade(part, amount, cost)
-        await ctx.send(ctx.message.channel,
-                               '```Congrats here is your new upgrades: {}```'.format(user_ship.info()))
+
+        await ctx.send('Congrats here is your new upgrades:')
+
+        em = discord.Embed(title='Ship Level', description=str(user_ship.level()), colour=0xDD0000)
+        em.set_author(name=ctx.message.author.name + '\'s Ship', icon_url=ctx.message.author.avatar_url)
+        em.add_field(name="__Part__", value=parts_print, inline=True)
+        em.add_field(name="__Level__", value=user_ship.info(), inline=True)
+        em.set_footer(text="Your ship's coffers hold {} gold".format(user_ship.gold),
+                      icon_url="https://cdn.discordapp.com/emojis/554730061463289857.gif")
+        em_msg = await ctx.send(embed=em)
 
 
 description = 'A pirate ship bot. Lets you fight other users and upgrade your ship. Sail on captain! \n Prefix is $'
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description=description, case_insensitive=True)
 bot.add_cog(Pirate(bot))
 
+if DEV:
+    bot.add_cog(Testing(bot))
 
 @bot.event
 async def on_ready():
@@ -393,16 +249,6 @@ async def on_ready():
     print('Logged in as:\n{0} (ID: {0.id})'.format(bot.user))
 
 
-"""reading the ship file to add all the users ships to the dataspace"""
-with open("ship_file.json", "r") as read_file:
-    first = read_file.read(1)
-    global ships
-    ships = []
-    if first:
-        read_file.seek(0)
-        json_data = json.load(read_file)
-        for s in json_data:
-            ships.append(s)
 
 #       print("here are the ships:")
 #       pprint.pprint(ships)

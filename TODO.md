@@ -8,36 +8,43 @@
 - [x] help command
     - [x] adding comments to functions creates explanation
 - [x] have overall level to view
-- [ ] more error checking
+- [x] more error checking
     - [x] function declarations should include default values 
 - [x] comments
 - [ ] make language more piratey
-- [ ] new lines per parameter
-- [ ] embedify like everything 
-
-
-## Later
-- [x] better fight mechanics
+- [x] new lines per parameter
+- [x] embedify like everything
+- [ ] add cost spent in upgrade embed at end 
+- [ ] ship command should show mentioned ship as well
+- [ ] better fight mechanics
     - [ ] some upgrades move the randint for chance to earn more
     - [ ] add a dodge chance?
-- [ ] better upgrade mechanics
-- [ ] better leveling mechanic
+- [x] upgrade mechanic is confusing
+- [x] double posting when started twice
+- [x] you can fight yourself
+- [x] too easy to upgrade
+- [ ] add @ to each message? maybe just **name**
+- [x] alias $battle to $fight
+
+## Later
+- [ ] port mechanic?
+- [x] better upgrade mechanics
+- [x] better leveling mechanic
 - [ ] win-loss records
-- [ ] ship command should show mentioned ship as well
 - [x] earn more gold against harder enemies
 - [ ] lose gold for losing fight
 - [ ] have opponent accept fight
 - [ ] more parameters
-- [ ] command aliases
+- [x] command aliases
 - [ ] naming their ships
 - [ ] play-testing
 - [ ] smoother experience (delete posts? add users name to each post? different formatting?)
-    - [ ] upgrades should list costs more clearly
+    - [x] upgrades should list costs more clearly
 - [ ] even more error checking
-    - [ ] keep in same channel
+    - [x] keep in same channel
 - [ ] position shouldn't be in json
 - [ ] json should include unique id for user
-- [ ] AWS
+- [x] AWS
 
 
 ### Eventually
@@ -52,9 +59,13 @@
     - [ ] 2 v 1
 - [ ] dailies
 - [ ] pictures for their ship
-- [ ] upgrade to discord.py 1.0
-- [ ] emotes
+- [x] upgrade to discord.py 1.0
+- [x] emotes
 - [ ] draw treasure map
+- [ ] alternative gold sources
+- [ ] lose crew after fights?
+- [ ] must stay in port for x time after upgrades?
+- [ ] morale system as alternative cooldown and lowered damage
 
 ### Future Upgrade Ideas
 - different boats
@@ -82,18 +93,5 @@
     - rigging
     - oarmen
     - gunpowder
-    
-    
-    
-## known problems
 
-- [x] upgrade mechanic is confusing
-- [ ] double posting when started twice
-- [x] you can fight yourself
-- [x] too easy to upgrade
-- [ ] add @ to each message? maybe just **name**
-- [x] alias $battle to $fight
-- [ ] alternative gold sources
-- [ ] lose crew after fights?
-- [ ] must stay in port for x time after upgrades?
-- [ ] morale system as alternative cooldown and lowered damage
+

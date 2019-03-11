@@ -1,30 +1,5 @@
 import json
 
-def write_json_file():
-    with open("ship_file.json", "w") as write_file:
-        json.dump(ships, write_file)
-
-
-def update(ship, is_new=False):
-    if is_new:
-        ships.append(ship.to_dict())
-    else:
-        ships[ship.position] = ship.to_dict()
-    write_json_file()
-
-def find_ship(captain):
-    """returns the ship based on captain from ships variable"""
-    index = 0
-    for s in ships:
-        if s['captain'] == captain:
-            s['position'] = index
-            temp_ship = Ship(captain)
-            temp_ship.from_dict(s)
-            return temp_ship
-        index += 1
-    return None
-
-
 
 class Ship:
     """defines a single instance of a ship"""
@@ -71,8 +46,8 @@ class Ship:
             return False
 
         self.gold -= cost
-        super().update(self)
-#        update(self)
+
+        self.update(self)
         return True
 
     def upgrade_costs(self):
@@ -113,6 +88,36 @@ class Ship:
 
         # should this be here?
         self.position = json_data['position']
+
+    @staticmethod
+    def write_json_file():
+        with open("ship_file.json", "w") as write_file:
+            json.dump(ships, write_file)
+
+    @staticmethod
+    def update(ship, is_new=False):
+        if is_new:
+            ships.append(ship.to_dict())
+        else:
+            ships[ship.position] = ship.to_dict()
+        Ship.write_json_file()
+
+    @staticmethod
+    def find_ship(captain):
+        """returns the ship based on captain from ships variable"""
+        index = 0
+        for s in ships:
+            if s['captain'] == captain:
+                s['position'] = index
+                temp_ship = Ship(captain)
+                temp_ship.from_dict(s)
+                return temp_ship
+            index += 1
+        return None
+
+    @staticmethod
+    def calc_upgrade(part, amount=1):
+        return sum([int(100 + float(((part + temp_amount) ** 1.2) * 20)) for temp_amount in range(amount, 0, -1)])
 
 """reading the ship file to add all the users ships to the dataspace"""
 with open("ship_file.json", "r") as read_file:

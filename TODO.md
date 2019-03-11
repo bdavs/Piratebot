@@ -82,12 +82,18 @@
     - oarmen
     - gunpowder
     
+    
+    
+## known problems
  ```
 upgrade mechanic is confusing
 double posting when started twice
 you can fight yourself
 too easy to upgrade
-add @ to each message?
+add @ to each message? maybe just **name**
 alias $battle to $fight
-
+alternative gold sources
+lose crew after fights?
+must stay in port for x time after upgrades?
+morale system as alternative cooldown and lowered damage
 ```

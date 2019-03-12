@@ -18,6 +18,15 @@ to install on most systems enter the following
 ```buildoutcfg
 python3 -m pip install -U discord.py
 ```
+>This didn't work for me and kept installing version 0.16 when I needed to use version 1.0
+> If it doens't work for you I had to do this:
+
+```bash
+$ git clone https://github.com/Rapptz/discord.py
+$ cd discord.py
+$ python3 -m pip install -U .[voice]
+```
+
 discord.py also has the following dependencies 
 - Python 3.4.2+
 - `aiohttp` library
@@ -50,7 +59,7 @@ Prefix is $
 Pirate:
   fight   starts a fight with someone in chat
   ship    look at your ship's info or create one if you're new
-  upgrade Upgade your ship
+  upgrade Upgrade your ship
 ​No Category:
   help    Shows this message.
 

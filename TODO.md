@@ -14,8 +14,8 @@
 - [ ] make language more piratey
 - [x] new lines per parameter
 - [x] embedify like everything
-- [ ] add cost spent in upgrade embed at end 
-- [ ] ship command should show mentioned ship as well
+- [x] add cost spent in upgrade embed at end 
+- [x] ship command should show mentioned ship as well
 - [ ] better fight mechanics
     - [ ] some upgrades move the randint for chance to earn more
     - [ ] add a dodge chance?
@@ -23,8 +23,9 @@
 - [x] double posting when started twice
 - [x] you can fight yourself
 - [x] too easy to upgrade
-- [ ] add @ to each message? maybe just **name**
+- [x] add @ to each message? maybe just **name**
 - [x] alias $battle to $fight
+- [ ] first time explanation of parts
 
 ## Later
 - [ ] port mechanic?

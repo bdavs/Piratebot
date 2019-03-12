@@ -25,23 +25,7 @@ class Testing(commands.Cog):
 
         """
         hi <:pirateThink:550815188119715840>
-        defenders = ctx.message.mentions
-        # only continue if valid attacker and defender
-        if not defenders:
-            await ctx.send('Who are you fighting?')
-            return
-        elif len(defenders) > 1:
-            await ctx.send('Who are you fighting? One at a time (for now)')
-            return
-        else:
-            defender = defenders[0].name
-
-            defender_ship = find_ship(defender)
-            if not defender_ship:
-                await ctx.send('{0} does not have a ship! '.format(defender))
-                return
         """
-
 
 
     @commands.command(pass_context=True, no_pm=True, hidden=True)

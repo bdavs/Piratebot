@@ -1,4 +1,4 @@
-DEV = False
+DEV = True
 import discord
 
 import random
@@ -26,7 +26,7 @@ class Pirate(commands.Cog):
         self.bot = bot
 
     @commands.command(pass_context=True, no_pm=True, aliases=['info'])
-    @commands.cooldown(1, COOLDOWN, commands.BucketType.user)
+    @commands.cooldown(1, 1, commands.BucketType.user)
     async def ship(self, ctx):
         """look at your ship's info or create one if you're new
         You may also look at another users ship with $ship @user
@@ -39,8 +39,10 @@ class Pirate(commands.Cog):
                 if not user_ship:
                     await ctx.send("{} does not yet have a ship.".format(captain))
                 else:
-                    em = discord.Embed(title='Ship Level', description=str(user_ship.level()), colour=0xAA0000)
+                    em = discord.Embed(colour=0xAA0000)
                     em.set_author(name=captain + '\'s Ship', icon_url=defender.avatar_url)
+                    em.add_field(name='Ship Level: {}'.format(str(user_ship.level())),
+                                 value="Win/Loss: {}/{}".format(user_ship.win, user_ship.loss), inline=False)
                     em.add_field(name="__Part__", value=parts_print, inline=True)
                     em.add_field(name="__Level__", value=user_ship.info(), inline=True)
                     em.set_footer(text="Their ship's coffers hold {} gold".format(user_ship.gold),
@@ -59,8 +61,11 @@ class Pirate(commands.Cog):
                            '\nCannons and Crew contribute to your attack,'
                            ' while Armor and Sails contribute to defense\nHere\'s what she\'s got:'.format(captain))
 
-        em = discord.Embed(title='Ship Level', description=str(user_ship.level()), colour=0xDD0000)
+        em = discord.Embed(colour=0xDD0000)
         em.set_author(name=ctx.message.author.name + '\'s Ship', icon_url=ctx.message.author.avatar_url)
+        em.add_field(name='Ship Level: {}'.format(str(user_ship.level())),
+                     value="Win/Loss: {}/{}".format(user_ship.win, user_ship.loss), inline=False)
+        #em.add_field(name='Ship Level', value=str(user_ship.level()), inline=False)
         em.add_field(name="__Part__", value=parts_print, inline=True)
         em.add_field(name="__Level__", value=user_ship.info(), inline=True)
         em.set_footer(text="Your ship's coffers hold {} gold".format(user_ship.gold),
@@ -124,24 +129,30 @@ class Pirate(commands.Cog):
                 defender_ship.damage_hull(attack)
                 attacker_ship.damage_hull(defense)
 
-                attacker_msg +=  'Fired a volley of **{}** cannonballs <a:cannon:554558216889958400> \n'.format(attack)
+                attacker_msg += 'Fired a volley of **{}** cannonballs <a:cannon:554558216889958400> \n'.format(attack)
                 defender_msg += '<a:cannon_reversed:554722119905181735> Returned fired a volley of **{}** cannonballs \n'.format(defense)
 
             em.add_field(name="__{}__".format(attacker), value=attacker_msg, inline=True)
             em.add_field(name="__{}__".format(defender), value=defender_msg, inline=True)
 
-            if attacker_ship.hull > defender_ship.hull:
-
+            if attacker_ship.hull > defender_ship.hull:  # attacker wins
                 # base gold at 100, more gold earned for harder fights, less or easier ones
                 gold = 100 + (defender_ship.level() - attacker_ship.level()) * 2
                 gold = gold if gold > 0 else 0
                 attacker_ship.gold += gold
+                attacker_ship.win += 1
+                defender_ship.loss += 1
                 Ship.update(attacker_ship)
+                Ship.update(defender_ship)
 
                 em.add_field(name='{} is the winner! :crossed_swords:'.format(attacker),
                              value='<a:treasure_chest:554730061463289857> They earned **{}** gold for their coffers.'.format(gold), inline=False)
 
-            else:
+            else:  # defender wins
+                defender_ship.win += 1
+                attacker_ship.loss += 1
+                Ship.update(attacker_ship)
+                Ship.update(defender_ship)
                 em.add_field(name='{} is the winner! :shield:'.format(defender),
                              value=' <a:armor:554559559545520128> Their ship survives to fight another day.', inline=False)
 
@@ -152,7 +163,7 @@ class Pirate(commands.Cog):
             defender_ship.repair_hull()
 
     @commands.command(pass_context=True, no_pm=True)
-    @commands.cooldown(1, COOLDOWN, commands.BucketType.user)
+    @commands.cooldown(1, 1, commands.BucketType.user)
     async def upgrade(self, ctx, part: str=None, amount=None):
         """Upgrade your ship"""
         user = ctx.message.author.name
@@ -162,7 +173,7 @@ class Pirate(commands.Cog):
             return
 
         if not part:
-            em = discord.Embed(title='Ship Upgrades', description=str("currently level: " + str(user_ship.level())), colour=0x3796ff)
+            em = discord.Embed(title='Ship Upgrades', description=str("Current Level: " + str(user_ship.level())), colour=0x3796ff)
             em.set_author(name=ctx.message.author.name + '\'s Ship has docked in the port', icon_url=ctx.message.author.avatar_url)
             em.add_field(name="__Part__", value=parts_print, inline=True)
             em.add_field(name="__Current Level__", value=user_ship.info(), inline=True)
@@ -206,16 +217,12 @@ class Pirate(commands.Cog):
                                    'Win some fights to earn more gold.'.format(part, amount, cost, user_ship.gold))
                     return
 
-
-#        cost = int(amount * 10 + (user_dict[part] + amount) / 10)
         if cost > user_ship.gold:
             await ctx.send('Upgrading {} by {} will cost {}. You only have {} gold. '
                            'Win some fights to earn more gold.'.format(part, amount, cost, user_ship.gold))
             return
 
         user_ship.upgrade(part, amount, cost)
-
-        # await ctx.send('Congrats here is your new upgrades:')
 
         em = discord.Embed(title="Upgraded {} by {} level(s)".format(part, amount),
                            description="This cost {} gold".format(cost), colour=0x3796ff)
@@ -234,6 +241,7 @@ bot.add_cog(Pirate(bot))
 
 if DEV:
     bot.add_cog(Testing(bot))
+
 
 @bot.event
 async def on_ready():

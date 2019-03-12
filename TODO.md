@@ -29,6 +29,8 @@
 
 ## Later
 - [ ] port mechanic?
+- [ ] other ways to earn gold - raiding
+    - [ ] fight NPCs? maybe just the bot itself
 - [x] better upgrade mechanics
 - [x] better leveling mechanic
 - [ ] win-loss records
@@ -37,7 +39,7 @@
 - [ ] have opponent accept fight
 - [ ] more parameters
 - [x] command aliases
-- [ ] naming their ships
+- [ ] naming their ships - subcommand of ship
 - [ ] play-testing
 - [ ] smoother experience (delete posts? add users name to each post? different formatting?)
     - [x] upgrades should list costs more clearly

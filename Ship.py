@@ -16,6 +16,8 @@ class Ship:
         self.position = 0
         self.win = 0
         self.loss = 0
+        self.x = 0
+        self.y = 0
 
         #self.parts_amt = [self.cannons, self.crew, self.armor, self.sails]
     def info(self):
@@ -75,7 +77,9 @@ class Ship:
             'sails': self.sails,
             'gold': self.gold,
             'win': self.win,
-            'loss': self.loss
+            'loss': self.loss,
+            'x': self.x,
+            'y': self.y
         }
 
     def from_dict(self, json_data=None):
@@ -91,6 +95,8 @@ class Ship:
         self.gold = json_data['gold']
         self.win = json_data['win']
         self.loss = json_data['loss']
+        self.x = json_data['x']
+        self.y = json_data['y']
 
         # should this be here?
         self.position = json_data['position']

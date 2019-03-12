@@ -1,4 +1,4 @@
-DEV = True
+DEV = False
 import discord
 
 import random
@@ -162,7 +162,7 @@ class Pirate(commands.Cog):
             return
 
         if not part:
-            em = discord.Embed(title='Ship Upgrades', description=str("currently level: " + str(user_ship.level())), colour=0xDD0000)
+            em = discord.Embed(title='Ship Upgrades', description=str("currently level: " + str(user_ship.level())), colour=0x3796ff)
             em.set_author(name=ctx.message.author.name + '\'s Ship has docked in the port', icon_url=ctx.message.author.avatar_url)
             em.add_field(name="__Part__", value=parts_print, inline=True)
             em.add_field(name="__Current Level__", value=user_ship.info(), inline=True)
@@ -188,8 +188,6 @@ class Pirate(commands.Cog):
             if amount.isdigit():
                 amount = int(amount)
                 cost = Ship.calc_upgrade(user_dict[part], amount)
-                await ctx.send('AMOUNT INCLUDED Upgrading {} by {} will cost {}. You only have {} gold. '
-                               'Win some fights to earn more gold.'.format(part, amount, cost, user_ship.gold))
             elif amount.lower() == 'max':
                 cost = 0
                 amount = 0
@@ -217,10 +215,12 @@ class Pirate(commands.Cog):
 
         user_ship.upgrade(part, amount, cost)
 
-        await ctx.send('Congrats here is your new upgrades:')
+        # await ctx.send('Congrats here is your new upgrades:')
 
-        em = discord.Embed(title='Ship Level', description=str(user_ship.level()), colour=0xDD0000)
+        em = discord.Embed(title="Upgraded {} by {} level(s)".format(part, amount),
+                           description="This cost {} gold".format(cost), colour=0x3796ff)
         em.set_author(name=ctx.message.author.name + '\'s Ship', icon_url=ctx.message.author.avatar_url)
+        em.add_field(name='Ship Level', value=str(user_ship.level()), inline=False)
         em.add_field(name="__Part__", value=parts_print, inline=True)
         em.add_field(name="__Level__", value=user_ship.info(), inline=True)
         em.set_footer(text="Your ship's coffers hold {} gold".format(user_ship.gold),

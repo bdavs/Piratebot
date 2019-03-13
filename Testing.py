@@ -30,14 +30,14 @@ class Testing(commands.Cog):
                           icon_url="https://cdn.discordapp.com/emojis/554730061463289857.gif")
             await ctx.send(embed=em)
 
-    @raid.command(pass_context=True, no_pm=True)
+    @raid.command(pass_context=True, no_pm=True, aliases=['sail'])
     async def move(self, ctx, direction=None):
         captain = ctx.message.author.name
         user_ship = Ship.find_ship(captain)
         current_place = places[user_ship.x][user_ship.y]
 
         if direction is None:
-            await ctx.send('Do we have a heading captain {}? North, South, East, West'.format(captain))
+            await ctx.send('Do we have a heading Captain {}? North, South, East, West'.format(captain))
             return
         direction = direction.lower()
         if direction == 'north' or direction == 'up':

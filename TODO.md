@@ -29,6 +29,7 @@
 - [ ] cooldowns yell at you for time remaining
     - [ ] probably should delete itself
 - [ ] update should be a self call
+- [ ] ship name in more places 
 
 ## Later
 - [ ] port mechanic?

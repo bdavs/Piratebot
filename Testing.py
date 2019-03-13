@@ -4,20 +4,22 @@ from Ship import Ship
 import json
 
 places = [["place0","place1","place2"],["place3","place4","place5"],["place6","place7","place8"]]
-
+# places = [list(x) for x in zip(places)]
 
 class Testing(commands.Cog):
     """These are the pirate commands"""
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.group(pass_context=True, no_pm=True)
     @commands.cooldown(1, 1, commands.BucketType.user)
-    async def raid(self, ctx, action: str=None, x:int =None, y:int =None):
-        captain = ctx.message.author.name
-        user_ship = Ship.find_ship(captain)
-        current_place = places[user_ship.x][user_ship.y]
-        if not action:  # display raid information
+    async def raid(self, ctx):
+        if not ctx.invoked_subcommand:  # display raid information
+
+            captain = ctx.message.author.name
+            user_ship = Ship.find_ship(captain)
+            current_place = places[user_ship.x][user_ship.y]
+
             em = discord.Embed(title="{}'s Raiding party".format(captain),
                                description="Level: {}".format(user_ship.level()), colour=0x33aa33)
             em.set_author(name=captain + '\'s Ship', icon_url=ctx.message.author.avatar_url)
@@ -26,8 +28,43 @@ class Testing(commands.Cog):
 
             em.set_footer(text="Your ship's coffers hold {} gold".format(user_ship.gold),
                           icon_url="https://cdn.discordapp.com/emojis/554730061463289857.gif")
-        if action == 'move':
+            await ctx.send(embed=em)
+
+    @raid.command(pass_context=True, no_pm=True)
+    async def move(self, ctx, direction=None):
+        captain = ctx.message.author.name
+        user_ship = Ship.find_ship(captain)
+        current_place = places[user_ship.x][user_ship.y]
+
+        if direction is None:
+            await ctx.send('Do we have a heading captain {}? North, South, East, West'.format(captain))
             return
+        direction = direction.lower()
+        if direction == 'north' or direction == 'up':
+            if user_ship.y + 1 > 2:
+                await ctx.send('Ye reached the edge of the map. Here thar be dragons. Ye turned back.')
+                return
+            user_ship.y += 1
+        elif direction == 'south' or direction == 'down':
+            if user_ship.y - 1 < 0:
+                await ctx.send('Ye reached the edge of the map. Here thar be dragons. Ye turned back.')
+                return
+            user_ship.y -= 1
+        elif direction == 'east' or direction == 'right':
+            if user_ship.y + 1 > 2:
+                await ctx.send('Ye reached the edge of the map. Here thar be dragons. Ye turned back.')
+                return
+            user_ship.x += 1
+        elif direction == 'west' or direction == 'left':
+            if user_ship.y + 1 > 2:
+                await ctx.send('Ye reached the edge of the map. Here thar be dragons. Ye turned back.')
+                return
+            user_ship.x -= 1
+        else:
+            await ctx.send('invalid direction')
+
+        Ship.update(user_ship)
+
 
 
     @commands.command(pass_context=True, no_pm=True, hidden=True)
@@ -79,7 +116,7 @@ class Testing(commands.Cog):
 
         im.save("marked_treasure_map.png", "PNG")
 
-        await ctx.send(ctx.message.channel, 'marked_treasure_map.png')
+        await ctx.send(file=discord.File('marked_treasure_map.png'))
 
 
 

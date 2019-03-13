@@ -26,14 +26,17 @@
 - [x] add @ to each message? maybe just **name**
 - [x] alias $battle to $fight
 - [ ] first time explanation of parts
+- [ ] cooldowns yell at you for time remaining
+    - [ ] probably should delete itself
+- [ ] update should be a self call
 
 ## Later
 - [ ] port mechanic?
-- [ ] other ways to earn gold - raiding
-    - [ ] fight NPCs? maybe just the bot itself
+- [ ] raiding
+    - [ ] raiding health mechanic
 - [x] better upgrade mechanics
 - [x] better leveling mechanic
-- [ ] win-loss records
+- [x] win-loss records
 - [x] earn more gold against harder enemies
 - [ ] lose gold for losing fight
 - [ ] have opponent accept fight
@@ -98,3 +101,7 @@
     - gunpowder
 
 
+Raid merchants small risk smaller profit
+Raid navy med risk med profit
+Raid armada high risk high profit
+Raid your mom high risk low profit :Kappa:

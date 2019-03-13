@@ -5,6 +5,7 @@ class Ship:
     """defines a single instance of a ship"""
     def __init__(self, user):
         self.captain = user
+        self.ship_name = user + "\'s ship"
         self.cannons = 1
         self.crew = 1
         self.armor = 1
@@ -71,6 +72,7 @@ class Ship:
         """creates a dict from ship params"""
         return {
             'captain': self.captain,
+            'ship_name': self.ship_name,
             'cannons': self.cannons,
             'crew': self.crew,
             'armor': self.armor,
@@ -88,6 +90,7 @@ class Ship:
             return None
 
         self.captain = json_data['captain']
+        self.ship_name = json_data['ship_name']
         self.cannons = json_data['cannons']
         self.crew = json_data['crew']
         self.armor = json_data['armor']

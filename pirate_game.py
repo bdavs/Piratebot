@@ -25,12 +25,14 @@ class Pirate(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(pass_context=True, no_pm=True, aliases=['info'])
+    @commands.group(pass_context=True, no_pm=True, aliases=['info'])
     @commands.cooldown(1, 1, commands.BucketType.user)
     async def ship(self, ctx):
         """look at your ship's info or create one if you're new
         You may also look at another users ship with $ship @user
         """
+        if ctx.invoked_subcommand:
+            return
         defenders = ctx.message.mentions
         if defenders:
             for defender in defenders:
@@ -71,6 +73,18 @@ class Pirate(commands.Cog):
         em.set_footer(text="Your ship's coffers hold {} gold".format(user_ship.gold),
                       icon_url="https://cdn.discordapp.com/emojis/554730061463289857.gif")
         em_msg = await ctx.send(embed=em)
+
+    @ship.command(pass_context=True, no_pm=True)
+    async def name(self, ctx, *, name=None):
+        """naming your ship"""
+        captain = ctx.message.author.name
+        user_ship = Ship.find_ship(captain)
+        if name is None:
+            await ctx.send('Your ship\'s current name is {}'.format(user_ship.ship_name))
+            return
+        user_ship.ship_name = name
+        Ship.update(user_ship)
+        await ctx.send('Your ship\'s new name is {}'.format(user_ship.ship_name))
 
     @commands.command(pass_context=True, no_pm=True, aliases=['battle', 'attack'])
     @commands.cooldown(1, COOLDOWN, commands.BucketType.user)
@@ -126,14 +140,18 @@ class Pirate(commands.Cog):
                 defense += defender_ship.cannons + defender_ship.crew
                 # defense -= attacker_ship.armor + attacker_ship.sails
 
+
                 defender_ship.damage_hull(attack)
                 attacker_ship.damage_hull(defense)
 
                 attacker_msg += 'Fired a volley of **{}** cannonballs <a:cannon:554558216889958400> \n'.format(attack)
                 defender_msg += '<a:cannon_reversed:554722119905181735> Returned fired a volley of **{}** cannonballs \n'.format(defense)
 
-            em.add_field(name="__{}__".format(attacker), value=attacker_msg, inline=True)
-            em.add_field(name="__{}__".format(defender), value=defender_msg, inline=True)
+            # reset hulls just in case
+            attacker_ship.repair_hull()
+            defender_ship.repair_hull()
+            em.add_field(name="__{}__ HP: {}".format(attacker, attacker_ship.hull), value=attacker_msg, inline=True)
+            em.add_field(name="__{}__ HP: {}".format(defender, defender_ship.hull), value=defender_msg, inline=True)
 
             if attacker_ship.hull > defender_ship.hull:  # attacker wins
                 # base gold at 100, more gold earned for harder fights, less or easier ones
@@ -158,9 +176,7 @@ class Pirate(commands.Cog):
 
             await ctx.send(embed=em)
 
-            # reset hulls just in case
-            attacker_ship.repair_hull()
-            defender_ship.repair_hull()
+
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 1, commands.BucketType.user)

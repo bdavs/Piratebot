@@ -1,6 +1,6 @@
 DEV = True
 import discord
-
+import error_handler
 import random
 from discord.ext import commands
 from Ship import Ship
@@ -19,13 +19,15 @@ parts_emotes = ['<a:cannon:554558216889958400> Cannons', '<a:crew:55455929160905
                 '<a:armor:554559559545520128> Armor', ' <a:sails:554558739747831808> Sails']
 parts_print = '\n'.join(parts_emotes)
 
+cooldown_times = []
+
 
 class Pirate(commands.Cog):
     """These are the pirate commands"""
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(pass_context=True, no_pm=True, aliases=['info'])
+    @commands.group(aliases=['info'])
     @commands.cooldown(1, 1, commands.BucketType.user)
     async def ship(self, ctx):
         """look at your ship's info or create one if you're new
@@ -57,7 +59,7 @@ class Pirate(commands.Cog):
 
         if not user_ship:
             user_ship = Ship(captain)
-            Ship.update(user_ship, is_new=True)
+            user_ship.update(is_new=True)
 
             await ctx.send('Congratulations on the new ship, Captain {}! Welcome aboard!'
                            '\nCannons and Crew contribute to your attack,'
@@ -74,7 +76,7 @@ class Pirate(commands.Cog):
                       icon_url="https://cdn.discordapp.com/emojis/554730061463289857.gif")
         em_msg = await ctx.send(embed=em)
 
-    @ship.command(pass_context=True, no_pm=True)
+    @ship.command()
     async def name(self, ctx, *, name=None):
         """naming your ship"""
         captain = ctx.message.author.name
@@ -83,10 +85,12 @@ class Pirate(commands.Cog):
             await ctx.send('Your ship\'s current name is {}'.format(user_ship.ship_name))
             return
         user_ship.ship_name = name
-        Ship.update(user_ship)
+        user_ship.update()
         await ctx.send('Your ship\'s new name is {}'.format(user_ship.ship_name))
 
-    @commands.command(pass_context=True, no_pm=True, aliases=['battle', 'attack'])
+    @commands.command(aliases=['battle', 'attack'])
+    # @commands.check(commands.guild_only())
+    @commands.guild_only()
     @commands.cooldown(1, COOLDOWN, commands.BucketType.user)
     async def fight(self, ctx):
         """starts a fight with someone in chat
@@ -112,7 +116,7 @@ class Pirate(commands.Cog):
                 attacker_ship.gold -= 50
                 if attacker_ship.gold < 0:
                     attacker_ship.gold = 0
-                Ship.update(attacker_ship)
+                attacker_ship.update()
                 await ctx.send('A mutiny has started on {0}\'s ship! The treasure hold has been ransacked! '
                                    '{1} gold was taken.'.format(defender, 50))
                 return
@@ -160,8 +164,8 @@ class Pirate(commands.Cog):
                 attacker_ship.gold += gold
                 attacker_ship.win += 1
                 defender_ship.loss += 1
-                Ship.update(attacker_ship)
-                Ship.update(defender_ship)
+                attacker_ship.update()
+                defender_ship.update()
 
                 em.add_field(name='{} is the winner! :crossed_swords:'.format(attacker),
                              value='<a:treasure_chest:554730061463289857> They earned **{}** gold for their coffers.'.format(gold), inline=False)
@@ -169,16 +173,25 @@ class Pirate(commands.Cog):
             else:  # defender wins
                 defender_ship.win += 1
                 attacker_ship.loss += 1
-                Ship.update(attacker_ship)
-                Ship.update(defender_ship)
+                attacker_ship.update()
+                defender_ship.update()
                 em.add_field(name='{} is the winner! :shield:'.format(defender),
                              value=' <a:armor:554559559545520128> Their ship survives to fight another day.', inline=False)
 
             await ctx.send(embed=em)
 
+    @fight.error
+    async def fight_error_handler(self, ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            await ctx.send("{}, Your ship is still being repaired from your last fight. It should be done in {} seconds".format(ctx.author.name, int(error.retry_after)))
+        elif isinstance(error, commands.NoPrivateMessage):
+            try:
+                return await ctx.author.send(f'{ctx.command} can not be used in Private Messages.')
+            except:
+                pass
 
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command()
     @commands.cooldown(1, 1, commands.BucketType.user)
     async def upgrade(self, ctx, part: str=None, amount=None):
         """Upgrade your ship"""
@@ -254,7 +267,7 @@ class Pirate(commands.Cog):
 description = 'A pirate ship bot. Lets you fight other users and upgrade your ship. Sail on captain! \n Prefix is $'
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description=description, case_insensitive=True)
 bot.add_cog(Pirate(bot))
-
+error_handler.setup(bot)
 if DEV:
     bot.add_cog(Testing(bot))
 

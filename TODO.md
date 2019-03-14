@@ -26,9 +26,9 @@
 - [x] add @ to each message? maybe just **name**
 - [x] alias $battle to $fight
 - [ ] first time explanation of parts
-- [ ] cooldowns yell at you for time remaining
+- [x] cooldowns yell at you for time remaining
     - [ ] probably should delete itself
-- [ ] update should be a self call
+- [x] update should be a self call
 - [ ] ship name in more places 
 
 ## Later
@@ -43,7 +43,7 @@
 - [ ] have opponent accept fight
 - [ ] more parameters
 - [x] command aliases
-- [ ] naming their ships - subcommand of ship
+- [x] naming their ships - subcommand of ship
 - [ ] play-testing
 - [ ] smoother experience (delete posts? add users name to each post? different formatting?)
     - [x] upgrades should list costs more clearly
@@ -52,6 +52,7 @@
 - [ ] position shouldn't be in json
 - [ ] json should include unique id for user
 - [x] AWS
+- [x] prevent pms
 
 
 ### Eventually

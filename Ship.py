@@ -52,7 +52,7 @@ class Ship:
 
         self.gold -= cost
 
-        self.update(self)
+        self.update()
         return True
 
     def upgrade_costs(self):
@@ -104,18 +104,17 @@ class Ship:
         # should this be here?
         self.position = json_data['position']
 
+    def update(self, is_new=False):
+        if is_new:
+            ships.append(self.to_dict())
+        else:
+            ships[self.position] = self.to_dict()
+        Ship.write_json_file()
+
     @staticmethod
     def write_json_file():
         with open("ship_file.json", "w") as write_file:
             json.dump(ships, write_file)
-
-    @staticmethod
-    def update(ship, is_new=False):
-        if is_new:
-            ships.append(ship.to_dict())
-        else:
-            ships[ship.position] = ship.to_dict()
-        Ship.write_json_file()
 
     @staticmethod
     def find_ship(captain):

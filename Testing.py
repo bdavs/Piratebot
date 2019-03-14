@@ -11,7 +11,7 @@ class Testing(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(pass_context=True, no_pm=True)
+    @commands.group()
     @commands.cooldown(1, 1, commands.BucketType.user)
     async def raid(self, ctx):
         if not ctx.invoked_subcommand:  # display raid information
@@ -30,7 +30,7 @@ class Testing(commands.Cog):
                           icon_url="https://cdn.discordapp.com/emojis/554730061463289857.gif")
             await ctx.send(embed=em)
 
-    @raid.command(pass_context=True, no_pm=True, aliases=['sail'])
+    @raid.command(aliases=['sail'])
     async def move(self, ctx, direction=None):
         captain = ctx.message.author.name
         user_ship = Ship.find_ship(captain)
@@ -63,11 +63,14 @@ class Testing(commands.Cog):
         else:
             await ctx.send('invalid direction')
 
-        Ship.update(user_ship)
+        user_ship.update()
 
+    @raid.command(aliases=['battle', 'attack'])
+    async def fight(self, ctx, direction=None):
 
+        return
 
-    @commands.command(pass_context=True, no_pm=True, hidden=True)
+    @commands.command(hidden=True)
     @commands.cooldown(1, 1, commands.BucketType.user)
     async def test2(self, ctx, user=None):
 
@@ -119,4 +122,44 @@ class Testing(commands.Cog):
         await ctx.send(file=discord.File('marked_treasure_map.png'))
 
 
+class Encounter:
+    def __init__(self, name, level, attack, defense, dodge, reward, description, on_land, special_encounter):
+        self.name = name
+        self.level = level
+        self.attack = attack
+        self.defense = defense
+        self.dodge = dodge
+        self.reward = reward
+        self.description = description
+        self.on_land = on_land
+        self.special_encounter = special_encounter
 
+    """
+    def __init__(self):
+        self.name = ""
+        self.level = 0
+        self.attack = 0
+        self.defense = 0
+        self.dodge = 0
+        self.reward = [0, ""]
+        self.description = ""
+        self.on_land = False
+        self.special_encounter = False
+
+        # self.encounter_chance
+        """
+
+    @classmethod
+    def fromfilename(cls, filename):
+        """"Initialize MyData from a file"""
+        data = open(filename).readlines()
+        return cls(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
+
+    def attack(self):
+        return
+
+    def defend(self):
+        return
+
+    def reward(self):
+        return

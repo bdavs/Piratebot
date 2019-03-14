@@ -1,10 +1,14 @@
 import discord
 from discord.ext import commands
+import os
 from Ship import Ship
 import json
 
+encounters_dir = "Encounters"
+
 places = [["place0","place1","place2"],["place3","place4","place5"],["place6","place7","place8"]]
 # places = [list(x) for x in zip(places)]
+
 
 class Testing(commands.Cog):
     """These are the pirate commands"""
@@ -163,3 +167,10 @@ class Encounter:
 
     def reward(self):
         return
+
+
+for filename in os.listdir(encounters_dir):
+    full_filename = encounters_dir + "/" + filename
+    data = open(full_filename, "r")
+    data = data.read().split("\n")
+    Encounter(data[0], int(data[1]), int(data[2]), int(data[3]), int(data[4]), list(data[3].split(",")), data[6], bool(data[7]), bool(data[8]))

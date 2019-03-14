@@ -19,7 +19,12 @@ parts_emotes = ['<a:cannon:554558216889958400> Cannons', '<a:crew:55455929160905
                 '<a:armor:554559559545520128> Armor', ' <a:sails:554558739747831808> Sails']
 parts_print = '\n'.join(parts_emotes)
 
-cooldown_times = []
+# cooldown_times = []
+
+# 20 hours for each daily now
+Daily_Time = 60 * 60 * 20
+Daily_Gold = 300
+
 
 
 class Pirate(commands.Cog):
@@ -263,6 +268,39 @@ class Pirate(commands.Cog):
                       icon_url="https://cdn.discordapp.com/emojis/554730061463289857.gif")
         em_msg = await ctx.send(embed=em)
 
+    @commands.command()
+    @commands.guild_only()
+    @commands.cooldown(1, Daily_Time, commands.BucketType.user)
+    async def daily(self, ctx):
+        captain = ctx.message.author.name
+        user_ship = Ship.find_ship(captain)
+        user_ship.gold += Daily_Gold
+        user_ship.update()
+        await ctx.send('You earned {} gold for your daily. Come back tomorrow for more'.format(Daily_Gold))
+
+    @daily.error
+    async def daily_error_handler(self, ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            seconds = int(error.retry_after)
+            hours = seconds / 3600
+            minutes = seconds / 60
+            if hours > 1:
+                await ctx.send(
+                    "{}, Your daily is not available yet. It should be available in {:0.1f} hours".format(
+                        ctx.author.name, hours))
+            elif minutes > 1:
+                await ctx.send(
+                    "{}, Your daily is not available yet. It should be available in {:0.1f} minutes".format(
+                        ctx.author.name, minutes))
+            else:
+                await ctx.send(
+                    "{}, Your daily is not available yet. It should be available in {:0.0f} seconds".format(
+                        ctx.author.name, seconds))
+        elif isinstance(error, commands.NoPrivateMessage):
+            try:
+                return await ctx.author.send(f'{ctx.command} can not be used in Private Messages.')
+            except:
+                pass
 
 description = 'A pirate ship bot. Lets you fight other users and upgrade your ship. Sail on captain! \n Prefix is $'
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description=description, case_insensitive=True)

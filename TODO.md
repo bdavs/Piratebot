@@ -1,4 +1,68 @@
 # To do
+- [ ] make language more piratey
+- [ ] first time explanation of parts
+- [x] cooldowns yell at you for time remaining
+    - [ ] probably should delete itself
+- [ ] ship name in more places 
+- [ ] raiding
+    - [ ] raiding health mechanic
+
+## Later
+- [ ] port mechanic?
+- [ ] lose gold for losing fight
+- [ ] have opponent accept fight
+- [ ] more parameters
+- [ ] play-testing
+- [ ] smoother experience (delete posts? add users name to each post? different formatting?)
+- [ ] even more error checking
+- [ ] position shouldn't be in json
+- [ ] json should include unique id for user
+- [ ] better fight mechanics
+    - [ ] some upgrades move the randint for chance to earn more
+    - [ ] add a dodge chance?
+
+### Eventually
+- [ ] fighting steals their gold
+- [ ] ships take damage
+    - [ ] sinking a ship means buying new one
+- [ ] other ways to earn gold
+    - [ ] fight NPCs? maybe just the bot itself
+- [ ] earn upgrades some other way (steal from ships?)
+- [ ] multi-ship battles
+    - [ ] armadas
+    - [ ] 2 v 1
+- [ ] pictures for their ship
+- [ ] draw treasure map
+- [ ] alternative gold sources
+- [ ] lose crew after fights?
+- [ ] must stay in port for x time after upgrades?
+- [ ] morale system as alternative cooldown and lowered damage
+
+##Completed tasks
+- [x] upgrade to discord.py 1.0
+- [x] emotes
+- [x] dailies
+- [x] AWS
+- [x] prevent pms
+- [x] command aliases
+- [x] naming their ships - subcommand of ship
+- [x] keep in same channel
+- [x] update should be a self call
+- [x] upgrades should list costs more clearly
+- [x] upgrade mechanic is confusing
+- [x] double posting when started twice
+- [x] you can fight yourself
+- [x] too easy to upgrade
+- [x] add @ to each message? maybe just **name**
+- [x] alias $battle to $fight
+- [x] better upgrade mechanics
+- [x] better leveling mechanic
+- [x] win-loss records
+- [x] earn more gold against harder enemies
+- [x] new lines per parameter
+- [x] embedify like everything
+- [x] add cost spent in upgrade embed at end 
+- [x] ship command should show mentioned ship as well
 - [x] updating json parameters
 - [x] add checks for ships when fighting
 - [x] add ship parameters to fight
@@ -11,69 +75,6 @@
 - [x] more error checking
     - [x] function declarations should include default values 
 - [x] comments
-- [ ] make language more piratey
-- [x] new lines per parameter
-- [x] embedify like everything
-- [x] add cost spent in upgrade embed at end 
-- [x] ship command should show mentioned ship as well
-- [ ] better fight mechanics
-    - [ ] some upgrades move the randint for chance to earn more
-    - [ ] add a dodge chance?
-- [x] upgrade mechanic is confusing
-- [x] double posting when started twice
-- [x] you can fight yourself
-- [x] too easy to upgrade
-- [x] add @ to each message? maybe just **name**
-- [x] alias $battle to $fight
-- [ ] first time explanation of parts
-- [x] cooldowns yell at you for time remaining
-    - [ ] probably should delete itself
-- [x] update should be a self call
-- [ ] ship name in more places 
-
-## Later
-- [ ] port mechanic?
-- [ ] raiding
-    - [ ] raiding health mechanic
-- [x] better upgrade mechanics
-- [x] better leveling mechanic
-- [x] win-loss records
-- [x] earn more gold against harder enemies
-- [ ] lose gold for losing fight
-- [ ] have opponent accept fight
-- [ ] more parameters
-- [x] command aliases
-- [x] naming their ships - subcommand of ship
-- [ ] play-testing
-- [ ] smoother experience (delete posts? add users name to each post? different formatting?)
-    - [x] upgrades should list costs more clearly
-- [ ] even more error checking
-    - [x] keep in same channel
-- [ ] position shouldn't be in json
-- [ ] json should include unique id for user
-- [x] AWS
-- [x] prevent pms
-
-
-### Eventually
-- [ ] fighting steals their gold
-- [ ] ships take damage
-    - [ ] sinking a ship means buying new one
-- [ ] other ways to earn gold
-    - [ ] fight NPCs? maybe just the bot itself
-- [ ] earn upgrades some other way (steal from ships?)
-- [ ] multi-ship battles
-    - [ ] armadas
-    - [ ] 2 v 1
-- [ ] dailies
-- [ ] pictures for their ship
-- [x] upgrade to discord.py 1.0
-- [x] emotes
-- [ ] draw treasure map
-- [ ] alternative gold sources
-- [ ] lose crew after fights?
-- [ ] must stay in port for x time after upgrades?
-- [ ] morale system as alternative cooldown and lowered damage
 
 ### Future Upgrade Ideas
 - different boats

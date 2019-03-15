@@ -2,6 +2,9 @@ import discord
 from discord.ext import commands
 import os
 from Ship import Ship
+import shutil
+import requests
+
 import json
 
 encounters_dir = "Encounters"
@@ -74,6 +77,35 @@ class Testing(commands.Cog):
 
         return
 
+    @raid.command(pass_context=True, no_pm=True, hidden=True)
+    @commands.cooldown(1, 1, commands.BucketType.user)
+    async def map(self, ctx, x: int = 200, y: int = 200):
+        """for testing only
+        currently takes an x and a y and crates an X on the treasure map """
+        x = int(x)
+        y = int(y)
+
+        # tune size for length of crosses in X
+        size = 25
+
+        # tune width for thickness of X
+        width = 20
+
+        from PIL import Image, ImageDraw
+
+        im = Image.open("assets/treasure_map.png")
+
+        draw = ImageDraw.Draw(im)
+
+        draw.line([(x - size, y - size), (x + size, y + size)], fill=(128, 0, 0), width=width)
+        draw.line([(x + size, y - size), (x - size, y + size)], fill=(128, 0, 0), width=width)
+
+        del draw
+
+        im.save("marked_treasure_map.png", "PNG")
+
+        await ctx.send(file=discord.File('marked_treasure_map.png'))
+
     @commands.command(hidden=True)
     @commands.cooldown(1, 1, commands.BucketType.user)
     async def test2(self, ctx, user=None):
@@ -95,12 +127,43 @@ class Testing(commands.Cog):
         hi <:pirateThink:550815188119715840>
         """
 
-
-    @commands.command(pass_context=True, no_pm=True, hidden=True)
+    @commands.command(hidden=True)
     @commands.cooldown(1, 1, commands.BucketType.user)
-    async def test(self, ctx, x: int = 0, y: int = 0):
+    async def test(self, ctx):
         """for testing only
-        currently takes an x and a y and crates an X on the treasure map """
+        makes your pfp into a pirate """
+        # mentions = ctx.message.mentions
+        if ctx.message.mentions:
+            url = ctx.message.mentions[0].avatar_url_as(format="png",size=256)
+        else:
+            url = ctx.message.author.avatar_url_as(format="png",size=256)
+
+        print(url)
+        from PIL import Image, ImageDraw
+
+        avatar_raw = "assets/avatar.png"
+
+        with requests.get(url, stream=True) as r:
+            with open("assets/avatar.png", 'wb') as out_file:
+                shutil.copyfileobj(r.raw, out_file)
+                out_file.close()
+
+        avatar = Image.open("assets/avatar.png")
+        hat = Image.open("assets/hat.png").convert('RGBA')
+        eyepatch = Image.open('assets/eyepatch.png').convert('RGBA')
+
+        # hat = hat.convert('RGBA')
+        hat = hat.resize(size=(200, 100))
+        avatar.paste(hat, box=(10, 10), mask=hat)
+
+        eyepatch = eyepatch.resize(size=(160, 80))
+        avatar.paste(eyepatch, box=(30, 85), mask=eyepatch)
+
+        avatar.save("assets/avatar_pirate.png", "PNG")
+
+        await ctx.send(file=discord.File('assets/avatar_pirate.png'))
+
+        """
         x = int(x)
         y = int(y)
 
@@ -124,6 +187,7 @@ class Testing(commands.Cog):
         im.save("marked_treasure_map.png", "PNG")
 
         await ctx.send(file=discord.File('marked_treasure_map.png'))
+        """
 
 
 class Encounter:

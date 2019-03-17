@@ -143,12 +143,9 @@ class Pirate(commands.Cog):
             while attacker_ship.hull > 0 and defender_ship.hull > 0:
                 attack = random.randint(1, 100)
                 attack += attacker_ship.cannons + attacker_ship.crew
-                # attack -= defender_ship.armor + defender_ship.sails
 
                 defense = random.randint(1, 100)
                 defense += defender_ship.cannons + defender_ship.crew
-                # defense -= attacker_ship.armor + attacker_ship.sails
-
 
                 defender_ship.damage_hull(attack)
                 attacker_ship.damage_hull(defense)
@@ -194,7 +191,6 @@ class Pirate(commands.Cog):
                 return await ctx.author.send(f'{ctx.command} can not be used in Private Messages.')
             except:
                 pass
-
 
     @commands.command()
     @commands.cooldown(1, 1, commands.BucketType.user)

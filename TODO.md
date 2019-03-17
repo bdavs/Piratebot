@@ -37,6 +37,7 @@
 - [ ] lose crew after fights?
 - [ ] must stay in port for x time after upgrades?
 - [ ] morale system as alternative cooldown and lowered damage
+- [ ] detect face in pfp to add hat/eyepatch
 
 ##Completed tasks
 - [x] upgrade to discord.py 1.0

@@ -3,6 +3,7 @@
 - [ ] first time explanation of parts
 - [x] cooldowns yell at you for time remaining
     - [ ] probably should delete itself
+    - [ ] only trigger on successful command
 - [ ] ship name in more places 
 - [ ] raiding
     - [ ] raiding health mechanic

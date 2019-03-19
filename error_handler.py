@@ -2,6 +2,7 @@ import traceback
 import sys
 from discord.ext import commands
 import discord
+from pirate_game import Pirate
 
 """
 If you are not using this inside a cog, add the event decorator e.g:
@@ -85,7 +86,8 @@ class CommandErrorHandler(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             if error.param.name == 'inp':
                 await ctx.send("You forgot to give me input to repeat!")
-                
+
+
 
 def setup(bot):
     bot.add_cog(CommandErrorHandler(bot))

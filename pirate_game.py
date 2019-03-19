@@ -4,22 +4,23 @@ import error_handler
 import random
 from discord.ext import commands
 from Ship import Ship
+from Raiding import Raiding,Encounter
 if DEV:
     from dev_tokenfile import TOKEN
-    COOLDOWN = 1
+    COOLDOWN = 30
     from Testing import Testing
 else:
     from tokenfile import TOKEN
     COOLDOWN = 30
 
-client = discord.Client()
+# client = discord.Client()
 
+
+# Constants
 parts = ['Cannons', 'Crew', 'Armor', 'Sails']
 parts_emotes = ['<a:cannon:554558216889958400> Cannons', '<a:crew:554559291609055242> Crew',
                 '<a:armor:554559559545520128> Armor', ' <a:sails:554558739747831808> Sails']
 parts_print = '\n'.join(parts_emotes)
-
-# cooldown_times = []
 
 # 20 hours for each daily now
 Daily_Time = 60 * 60 * 20
@@ -49,7 +50,7 @@ class Pirate(commands.Cog):
                     await ctx.send("{} does not yet have a ship.".format(captain))
                 else:
                     em = discord.Embed(colour=0xAA0000)
-                    em.set_author(name=captain + '\'s Ship', icon_url=defender.avatar_url)
+                    em.set_author(name=user_ship.ship_name, icon_url=defender.avatar_url)
                     em.add_field(name='Ship Level: {}'.format(str(user_ship.level())),
                                  value="Win/Loss: {}/{}".format(user_ship.win, user_ship.loss), inline=False)
                     em.add_field(name="__Part__", value=parts_print, inline=True)
@@ -71,7 +72,8 @@ class Pirate(commands.Cog):
                            ' while Armor and Sails contribute to defense\nHere\'s what she\'s got:'.format(captain))
 
         em = discord.Embed(colour=0xDD0000)
-        em.set_author(name=ctx.message.author.name + '\'s Ship', icon_url=ctx.message.author.avatar_url)
+        em.set_author(name=user_ship.ship_name,
+                      icon_url=ctx.message.author.avatar_url)
         em.add_field(name='Ship Level: {}'.format(str(user_ship.level())),
                      value="Win/Loss: {}/{}".format(user_ship.win, user_ship.loss), inline=False)
         #em.add_field(name='Ship Level', value=str(user_ship.level()), inline=False)
@@ -94,7 +96,6 @@ class Pirate(commands.Cog):
         await ctx.send('Your ship\'s new name is {}'.format(user_ship.ship_name))
 
     @commands.command(aliases=['battle', 'attack'])
-    # @commands.check(commands.guild_only())
     @commands.guild_only()
     @commands.cooldown(1, COOLDOWN, commands.BucketType.user)
     async def fight(self, ctx):
@@ -110,6 +111,8 @@ class Pirate(commands.Cog):
             return
         if not defenders:
             await ctx.send('Who are you fighting? `$fight @user` to fight someone')
+            # reset cooldowns when not successful fights
+            # self.fight.reset_cooldown()
             return
         elif len(defenders) > 1:
             await ctx.send('Who are you fighting? One at a time (for now)')
@@ -132,7 +135,7 @@ class Pirate(commands.Cog):
                                    ' on the high sea if there are no ships to fight'.format(defender))
                 return
 
-            #actually start fight
+            # actually start fight
             em = discord.Embed(title='{0} has attacked {1} :rage: '.format(attacker, defender),  colour=0xDDDD00)
 
             # calculate who wins based on their attack and defense plus random number
@@ -151,7 +154,7 @@ class Pirate(commands.Cog):
                 attacker_ship.damage_hull(defense)
 
                 attacker_msg += 'Fired a volley of **{}** cannonballs <a:cannon:554558216889958400> \n'.format(attack)
-                defender_msg += '<a:cannon_reversed:554722119905181735> Returned fired a volley of **{}** cannonballs \n'.format(defense)
+                defender_msg += '<a:cannon_reversed:554722119905181735> Return fired a volley of **{}** cannonballs \n'.format(defense)
 
             # reset hulls just in case
             attacker_ship.repair_hull()
@@ -185,7 +188,9 @@ class Pirate(commands.Cog):
     @fight.error
     async def fight_error_handler(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send("{}, Your ship is still being repaired from your last fight. It should be done in {} seconds".format(ctx.author.name, int(error.retry_after)))
+            await ctx.send(
+                "{}, Your ship is still being repaired from your last fight. It should be done in {} seconds".format(
+                    ctx.author.name, int(error.retry_after)))
         elif isinstance(error, commands.NoPrivateMessage):
             try:
                 return await ctx.author.send(f'{ctx.command} can not be used in Private Messages.')
@@ -194,7 +199,7 @@ class Pirate(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 1, commands.BucketType.user)
-    async def upgrade(self, ctx, part: str=None, amount=None):
+    async def upgrade(self, ctx, part: str = None, amount=None):
         """Upgrade your ship"""
         user = ctx.message.author.name
         user_ship = Ship.find_ship(user)
@@ -208,7 +213,7 @@ class Pirate(commands.Cog):
             em.add_field(name="__Part__", value=parts_print, inline=True)
             em.add_field(name="__Current Level__", value=user_ship.info(), inline=True)
             em.add_field(name="__Next Upgrade Costs__", value=user_ship.upgrade_costs(), inline=True)
-            em.add_field(name="To upgrade: `$upgrade part`", value="you can also say `$upgrade part amount` or `$upgrade part max` to upgrade multiple levels", inline=False)
+            em.add_field(name="To upgrade: `$upgrade part`", value="You can also say `$upgrade part amount` or `$upgrade part max` to upgrade multiple levels", inline=False)
             em.set_footer(text="Your ship's coffers hold {} gold".format(user_ship.gold),
                           icon_url="https://cdn.discordapp.com/emojis/554730061463289857.gif")
             em_msg = await ctx.send(embed=em)
@@ -216,7 +221,8 @@ class Pirate(commands.Cog):
 
         part = part.lower()
         if part not in map(str.lower, parts):
-            await ctx.send('Sorry, that\'s not an upgradable part. What part would you like to upgrade? Acceptable parameters are:\n{}'.format(parts_print))
+            await ctx.send('Sorry, that\'s not an upgradable part. What part would you like to upgrade? '
+                           'Acceptable parameters are:\n{}'.format(parts_print))
             return
 
         user_dict = user_ship.to_dict()
@@ -236,7 +242,7 @@ class Pirate(commands.Cog):
                     amount += 1
                     cost = Ship.calc_upgrade(user_dict[part], amount)
 
-                #stop overdrafting gold
+                # stop over-drafting gold
                 amount -= 1
                 cost = Ship.calc_upgrade(user_dict[part], amount)
 
@@ -298,18 +304,21 @@ class Pirate(commands.Cog):
             except:
                 pass
 
-description = 'A pirate ship bot. Lets you fight other users and upgrade your ship. Sail on captain! \n Prefix is $'
-bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description=description, case_insensitive=True)
-bot.add_cog(Pirate(bot))
-error_handler.setup(bot)
-if DEV:
-    bot.add_cog(Testing(bot))
+if __name__ == "__main__":
+    description = 'A pirate ship bot. Lets you fight other users and upgrade your ship. Sail on captain! \n Prefix is $'
+    bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description=description, case_insensitive=True)
+    bot.add_cog(Pirate(bot))
+    error_handler.setup(bot)
+    if DEV:  # to be used when testing
+        bot.add_cog(Testing(bot))
+        bot.add_cog(Raiding(bot))
 
 
-@bot.event
-async def on_ready():
-    """ran once connected. good place for environment changes"""
-    await bot.change_presence(activity=discord.Game(name='Sailing the High Seas | $help'))
-    print('Logged in as:\n{0} (ID: {0.id})'.format(bot.user))
+    @bot.event
+    async def on_ready():
+        """ran once connected. good place for environment changes"""
+        await bot.change_presence(activity=discord.Game(name='Sailing the High Seas | $help'))
+        print('Logged in as:\n{0} (ID: {0.id})'.format(bot.user))
 
-bot.run(TOKEN)
+# if __name__ == "__main__":
+    bot.run(TOKEN)

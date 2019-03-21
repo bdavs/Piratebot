@@ -37,6 +37,9 @@ def from_dict(self, json_data=None):
     # should this be here?
     self.position = json_data['position']
 
+    return True
+
+
 def write_ships(ship):
     ships[ship.position] = ship
 

@@ -1,0 +1,8 @@
+Village
+1
+5
+5
+5
+100, cannon
+This is a village
+False

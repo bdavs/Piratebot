@@ -7,6 +7,7 @@
 - [ ] ship name in more places 
 - [ ] raiding
     - [ ] raiding health mechanic
+    - [ ] strip newlines on reading encounters
 
 ## Later
 - [ ] port mechanic?

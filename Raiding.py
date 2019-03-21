@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import os
+import os, random
 from Ship import Ship
 
 encounters_dir = "Encounters"
@@ -68,21 +68,33 @@ class Raiding(commands.Cog):
         else:
             await ctx.send('invalid direction')
 
+        await ctx.send('Yer new location is {},{}'.format(user_ship.x,user_ship.y))
+
         user_ship.update()
 
-
     @raid.command(aliases=['battle', 'attack'])
-    async def fight(self, ctx, direction=None):
-        return
+    async def fight(self, ctx):
 
+        captain = ctx.message.author.name
+        user_ship = Ship.find_ship(captain)
+        if not user_ship:
+            await ctx.send('{0}, you do not have a ship! `$ship` to get one'.format(ctx.message.author.mention))
+            return
+
+        encounter = Encounter.from_filename(encounters_dir + "/" + random.choice(os.listdir(encounters_dir)))
+
+        await ctx.send('You encounter a {}, {} \n is can deal {} damage'.format(encounter.name, encounter.description, encounter.attack))
+
+        return
 
     @raid.command(hidden=True)
     @commands.cooldown(1, 1, commands.BucketType.user)
     async def map(self, ctx, x: int = 200, y: int = 200):
         """for testing only
         currently takes an x and a y and crates an X on the treasure map """
-        x = int(x)
-        y = int(y)
+
+        captain = ctx.message.author.name
+        user_ship = Ship.find_ship(captain)
 
         # tune size for length of crosses in X
         size = 25
@@ -93,6 +105,14 @@ class Raiding(commands.Cog):
         from PIL import Image, ImageDraw
 
         im = Image.open("assets/treasure_map.png")
+
+        # draw.line((0, im.size[1], im.size[0], 0), fill=(0,128,0), width=10)
+        x = im.size[0] / 3 * (user_ship.x + 1)
+        y = im.size[1] - (im.size[1] / 3 * (user_ship.y + 1))
+        # print(x,y)
+
+#        x = int(x)
+#        y = int(y)
 
         draw = ImageDraw.Draw(im)
 
@@ -107,7 +127,7 @@ class Raiding(commands.Cog):
 
 
 class Encounter:
-    def __init__(self, name, level, attack, defense, dodge, reward, description, on_land, special_encounter):
+    def __init__(self, name, level, attack, defense, dodge, reward, description, special_encounter):
         self.name = name
         self.level = level
         self.attack = attack
@@ -115,7 +135,6 @@ class Encounter:
         self.dodge = dodge
         self.reward = reward
         self.description = description
-        self.on_land = on_land
         self.special_encounter = special_encounter
 
     """
@@ -127,17 +146,16 @@ class Encounter:
         self.dodge = 0
         self.reward = [0, ""]
         self.description = ""
-        self.on_land = False
         self.special_encounter = False
 
         # self.encounter_chance
         """
 
     @classmethod
-    def fromfilename(cls, filename):
+    def from_filename(cls, filename):
         """"Initialize MyData from a file"""
         data = open(filename).readlines()
-        return cls(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
+        return cls(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7])
 
     def attack(self):
         return
@@ -148,9 +166,11 @@ class Encounter:
     def reward(self):
         return
 
-
+"""
+encounters = []
 for filename in os.listdir(encounters_dir):
     full_filename = encounters_dir + "/" + filename
     data = open(full_filename, "r")
     data = data.read().split("\n")
-    Encounter(data[0], int(data[1]), int(data[2]), int(data[3]), int(data[4]), list(data[3].split(",")), data[6], bool(data[7]), bool(data[8]))
+    encounters.append(Encounter(data[0], int(data[1]), int(data[2]), int(data[3]), int(data[4]), list(data[3].split(",")), data[6], bool(data[7])))
+"""

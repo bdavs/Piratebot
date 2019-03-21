@@ -3,7 +3,7 @@ A pirate ship bot. Lets you fight other users and upgrade your ship. Sail on cap
 
 ## Installation
 
-PirateBot was created on python 3.6. no other versions were tested (3.7 is definitely broken)
+PirateBot was created on python 3.6. no other versions were tested (3.7 now works with rewrite)
 
 ### discord.py
 PirateBot relies on discord.py, an API wrapper for Discord written in Python. 
@@ -12,14 +12,14 @@ It's available at https://github.com/Rapptz/discord.py
 
 Documentation to be found at 
 https://discordpy.readthedocs.io/en/rewrite/index.html
-and https://discordpy.readthedocs.io/en/latest/
+and https://discordpy.readthedocs.io/en/latest/ (I'm using the rewrite but sometimes its easier to find stuff in the other repo)
 
 to install on most systems enter the following
 ```buildoutcfg
 python3 -m pip install -U discord.py
 ```
->This didn't work for me and kept installing version 0.16 when I needed to use version 1.0
-> If it doens't work for you I had to do this:
+>This didn't work for me and kept installing version 0.16 when I needed to use version 1.0 (the rewrite)
+> If it doesn't work for you I had to do this:
 
 ```bash
 $ git clone https://github.com/Rapptz/discord.py
@@ -66,7 +66,3 @@ Pirate:
 Type $help command for more info on a command.
 You can also type $help category for more info on a category.
 ```
-
-### Example
-
-screenshot

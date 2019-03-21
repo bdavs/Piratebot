@@ -39,8 +39,9 @@ class Testing(commands.Cog):
     @commands.command(hidden=True)
     @commands.cooldown(1, 1, commands.BucketType.user)
     async def piratify(self, ctx, resize: int = 100, x: int = 10, y: int = 10):
-        """for testing only
-        makes your pfp into a pirate """
+        """ makes your pfp into a pirate
+        alternative `$pirate percent_resize x y` with x and y starting in top left and going to 256
+        """
         # mentions = ctx.message.mentions
         if ctx.message.mentions:
             url = ctx.message.mentions[0].avatar_url_as(format="png", size=256)

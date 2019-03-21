@@ -6,4 +6,3 @@ Merchant
 100, cannon
 This is a merchant ship
 False
-False

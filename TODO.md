@@ -111,3 +111,8 @@ Raid merchants small risk smaller profit
 Raid navy med risk med profit
 Raid armada high risk high profit
 Raid your mom high risk low profit :Kappa:
+
+raids on land - crews
+various villages?
+going fast - sails?
+

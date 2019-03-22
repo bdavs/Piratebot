@@ -72,7 +72,7 @@ class Raiding(commands.Cog):
 
         user_ship.update()
 
-    @raid.command(aliases=['battle', 'attack'])
+    @raid.command(aliases=['battle', 'attack', 'encounter'])
     async def fight(self, ctx):
 
         captain = ctx.message.author.name
@@ -80,10 +80,10 @@ class Raiding(commands.Cog):
         if not user_ship:
             await ctx.send('{0}, you do not have a ship! `$ship` to get one'.format(ctx.message.author.mention))
             return
+        encounter_file = random.choice(os.listdir(encounters_dir))
+        encounter = Encounter.from_filename(encounters_dir + "/" + encounter_file)
 
-        encounter = Encounter.from_filename(encounters_dir + "/" + random.choice(os.listdir(encounters_dir)))
-
-        await ctx.send('You encounter a {}, {} \n is can deal {} damage'.format(encounter.name, encounter.description, encounter.attack))
+        await ctx.send('You encounter a {}, {} \n it can deal {} damage'.format(encounter.name, encounter.description, encounter.attack))
 
         return
 
@@ -154,7 +154,11 @@ class Encounter:
     @classmethod
     def from_filename(cls, filename):
         """"Initialize MyData from a file"""
-        data = open(filename).readlines()
+        data = []
+        with open(filename) as f:
+            for line in f:
+                data.append(line.strip())
+
         return cls(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7])
 
     def attack(self):

@@ -1,4 +1,4 @@
-DEV = True
+DEV = False
 import discord
 import error_handler
 import random
@@ -7,11 +7,11 @@ from Ship import Ship
 from Raiding import Raiding,Encounter
 if DEV:
     from dev_tokenfile import TOKEN
-    COOLDOWN = 30
+    COOLDOWN = 1
     from Testing import Testing
 else:
     from tokenfile import TOKEN
-    COOLDOWN = 30
+    COOLDOWN = 10
 
 # client = discord.Client()
 

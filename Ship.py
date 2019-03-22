@@ -5,6 +5,7 @@ class Ship:
     """defines a single instance of a ship"""
     def __init__(self, user):
         self.captain = user
+        self.ship_name = user + "\'s ship"
         self.cannons = 1
         self.crew = 1
         self.armor = 1
@@ -14,6 +15,10 @@ class Ship:
         self.gold = 0
 
         self.position = 0
+        self.win = 0
+        self.loss = 0
+        self.x = 0
+        self.y = 0
 
         #self.parts_amt = [self.cannons, self.crew, self.armor, self.sails]
     def info(self):
@@ -47,7 +52,7 @@ class Ship:
 
         self.gold -= cost
 
-        self.update(self)
+        self.update()
         return True
 
     def upgrade_costs(self):
@@ -67,11 +72,16 @@ class Ship:
         """creates a dict from ship params"""
         return {
             'captain': self.captain,
+            'ship_name': self.ship_name,
             'cannons': self.cannons,
             'crew': self.crew,
             'armor': self.armor,
             'sails': self.sails,
-            'gold': self.gold
+            'gold': self.gold,
+            'win': self.win,
+            'loss': self.loss,
+            'x': self.x,
+            'y': self.y
         }
 
     def from_dict(self, json_data=None):
@@ -80,27 +90,31 @@ class Ship:
             return None
 
         self.captain = json_data['captain']
+        self.ship_name = json_data['ship_name']
         self.cannons = json_data['cannons']
         self.crew = json_data['crew']
         self.armor = json_data['armor']
         self.sails = json_data['sails']
         self.gold = json_data['gold']
+        self.win = json_data['win']
+        self.loss = json_data['loss']
+        self.x = json_data['x']
+        self.y = json_data['y']
 
         # should this be here?
         self.position = json_data['position']
+
+    def update(self, is_new=False):
+        if is_new:
+            ships.append(self.to_dict())
+        else:
+            ships[self.position] = self.to_dict()
+        Ship.write_json_file()
 
     @staticmethod
     def write_json_file():
         with open("ship_file.json", "w") as write_file:
             json.dump(ships, write_file)
-
-    @staticmethod
-    def update(ship, is_new=False):
-        if is_new:
-            ships.append(ship.to_dict())
-        else:
-            ships[ship.position] = ship.to_dict()
-        Ship.write_json_file()
 
     @staticmethod
     def find_ship(captain):

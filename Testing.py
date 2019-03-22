@@ -1,16 +1,25 @@
 import discord
 from discord.ext import commands
-
+import shutil
+import requests
 
 class Testing(commands.Cog):
     """These are the pirate commands"""
     def __init__(self, bot):
         self.bot = bot
-    @commands.command(pass_context=True, no_pm=True, hidden=True)
+
+    @commands.command(hidden=True)
     @commands.cooldown(1, 1, commands.BucketType.user)
-    async def test2(self, ctx, user=None):
+    async def list_emojis(self, ctx, user=None):
 
         print(self.bot.emojis)
+        await ctx.send(str(self.bot.emojis))
+
+    @commands.command(hidden=True)
+    @commands.cooldown(1, 1, commands.BucketType.user)
+    async def embed_test(self, ctx, user=None):
+
+        # print(self.bot.emojis)
         #await ctx.send_typing(ctx.message.channel)
         em = discord.Embed(title='My Embed Title', description='My Embed Content.', colour=0xDD0000)
         em.set_author(name=ctx.message.author.name, icon_url=ctx.message.author.avatar_url)
@@ -25,50 +34,52 @@ class Testing(commands.Cog):
 
         """
         hi <:pirateThink:550815188119715840>
-        defenders = ctx.message.mentions
-        # only continue if valid attacker and defender
-        if not defenders:
-            await ctx.send('Who are you fighting?')
-            return
-        elif len(defenders) > 1:
-            await ctx.send('Who are you fighting? One at a time (for now)')
-            return
-        else:
-            defender = defenders[0].name
-
-            defender_ship = find_ship(defender)
-            if not defender_ship:
-                await ctx.send('{0} does not have a ship! '.format(defender))
-                return
         """
 
-
-
-    @commands.command(pass_context=True, no_pm=True, hidden=True)
+    @commands.command(hidden=True)
     @commands.cooldown(1, 1, commands.BucketType.user)
-    async def test(self, ctx, x: int = 0, y: int = 0):
-        """for testing only
-        currently takes an x and a y and crates an X on the treasure map """
-        x = int(x)
-        y = int(y)
+    async def piratify(self, ctx, resize: int = 100, x: int = 10, y: int = 10):
+        """ makes your pfp into a pirate
+        alternative `$pirate percent_resize x y` with x and y starting in top left and going to 256
+        """
+        # mentions = ctx.message.mentions
+        if ctx.message.mentions:
+            url = ctx.message.mentions[0].avatar_url_as(format="png", size=256)
+        else:
+            url = ctx.message.author.avatar_url_as(format="png", size=256)
 
-        # tune size for length of crosses in X
-        size = 25
-
-        # tune width for thickness of X
-        width = 20
-
+        print(url)
         from PIL import Image, ImageDraw
 
-        im = Image.open("assets/treasure_map.png")
+        avatar_raw = "assets/avatar.png"
 
-        draw = ImageDraw.Draw(im)
+        with requests.get(url, stream=True) as r:
+            with open(avatar_raw, 'wb') as out_file:
+                shutil.copyfileobj(r.raw, out_file)
+                out_file.close()
 
-        draw.line([(x-size, y-size), (x+size, y+size)], fill=(128, 0, 0), width=width)
-        draw.line([(x+size, y-size), (x-size, y+size)], fill=(128, 0, 0), width=width)
+        avatar = Image.open(avatar_raw)
+        hat = Image.open("assets/hat.png").convert('RGBA')
+        eyepatch = Image.open('assets/eyepatch.png').convert('RGBA')
 
-        del draw
+        hat_width = int(200/100 * resize)
+        hat_height = int(100/100 * resize)
+        hat = hat.resize(size=(hat_width, hat_height))
 
-        im.save("marked_treasure_map.png", "PNG")
+        eyepatch_width = int(160/100 * resize)
+        eyepatch_height = int(80/100 * resize)
+        eyepatch = eyepatch.resize(size=(eyepatch_width, eyepatch_height))
 
-        await ctx.send(ctx.message.channel, 'marked_treasure_map.png')
+        hat_x = int(0 + x)
+        hat_y = int(0 + y)
+        avatar.paste(hat, box=(hat_x, hat_y), mask=hat)
+
+        eyepatch_x = int(20 + x)
+        eyepatch_y = int(75 + y)
+        avatar.paste(eyepatch, box=(eyepatch_x, eyepatch_y), mask=eyepatch)
+
+        avatar.save("assets/avatar_pirate.png", "PNG")
+
+        await ctx.send(file=discord.File('assets/avatar_pirate.png'))
+
+

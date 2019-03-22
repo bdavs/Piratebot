@@ -1,4 +1,4 @@
-DEV = False
+DEV = True
 import discord
 import error_handler
 import random
@@ -143,6 +143,7 @@ class Pirate(commands.Cog):
             defender_ship.repair_hull()
             attacker_msg = ''
             defender_msg = ''
+
             while attacker_ship.hull > 0 and defender_ship.hull > 0:
                 attack = random.randint(1, 100)
                 attack += attacker_ship.cannons + attacker_ship.crew
@@ -156,11 +157,7 @@ class Pirate(commands.Cog):
                 attacker_msg += 'Fired a volley of **{}** cannonballs <a:cannon:554558216889958400> \n'.format(attack)
                 defender_msg += '<a:cannon_reversed:554722119905181735> Return fired a volley of **{}** cannonballs \n'.format(defense)
 
-            # reset hulls just in case
-            attacker_ship.repair_hull()
-            defender_ship.repair_hull()
-            em.add_field(name="__{}__ HP: {}".format(attacker, attacker_ship.hull), value=attacker_msg, inline=True)
-            em.add_field(name="__{}__ HP: {}".format(defender, defender_ship.hull), value=defender_msg, inline=True)
+
 
             if attacker_ship.hull > defender_ship.hull:  # attacker wins
                 # base gold at 100, more gold earned for harder fights, less or easier ones
@@ -169,6 +166,11 @@ class Pirate(commands.Cog):
                 attacker_ship.gold += gold
                 attacker_ship.win += 1
                 defender_ship.loss += 1
+                # reset hulls just in case
+                attacker_ship.repair_hull()
+                defender_ship.repair_hull()
+                em.add_field(name="__{}__ HP: {}".format(attacker, attacker_ship.hull), value=attacker_msg, inline=True)
+                em.add_field(name="__{}__ HP: {}".format(defender, defender_ship.hull), value=defender_msg, inline=True)
                 attacker_ship.update()
                 defender_ship.update()
 
@@ -178,6 +180,11 @@ class Pirate(commands.Cog):
             else:  # defender wins
                 defender_ship.win += 1
                 attacker_ship.loss += 1
+                # reset hulls just in case
+                attacker_ship.repair_hull()
+                defender_ship.repair_hull()
+                em.add_field(name="__{}__ HP: {}".format(attacker, attacker_ship.hull), value=attacker_msg, inline=True)
+                em.add_field(name="__{}__ HP: {}".format(defender, defender_ship.hull), value=defender_msg, inline=True)
                 attacker_ship.update()
                 defender_ship.update()
                 em.add_field(name='{} is the winner! :shield:'.format(defender),

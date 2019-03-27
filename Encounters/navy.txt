@@ -1,8 +1,8 @@
-Merchant
+Naval Ship
 1
 5
 5
 5
 100, cannon
-This is a merchant ship
+This is a ship in the Queen's navy
 False

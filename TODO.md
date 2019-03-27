@@ -22,6 +22,9 @@
 - [ ] better fight mechanics
     - [ ] some upgrades move the randint for chance to earn more
     - [ ] add a dodge chance?
+- [ ] better upgrade mechanics
+    - [ ] set caps on levels of upgrades
+    - [ ] once you hit a certain level you can get a new boat with new caps
 
 ### Eventually
 - [ ] fighting steals their gold

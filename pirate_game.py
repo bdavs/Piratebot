@@ -277,7 +277,7 @@ class Pirate(commands.Cog):
                       icon_url="https://cdn.discordapp.com/emojis/554730061463289857.gif")
         em_msg = await ctx.send(embed=em)
 
-    @commands.command()
+    @commands.command(aliases=['ration', 'rations'])
     @commands.guild_only()
     @commands.cooldown(1, Daily_Time, commands.BucketType.user)
     async def daily(self, ctx):
@@ -285,7 +285,7 @@ class Pirate(commands.Cog):
         user_ship = Ship.find_ship(captain)
         user_ship.gold += Daily_Gold
         user_ship.update()
-        await ctx.send('You earned {} gold for your daily. Come back tomorrow for more'.format(Daily_Gold))
+        await ctx.send('You earned your daily ration of {} gold. Come back tomorrow for more'.format(Daily_Gold))
 
     @daily.error
     async def daily_error_handler(self, ctx, error):
@@ -293,26 +293,30 @@ class Pirate(commands.Cog):
             seconds = int(error.retry_after)
             hours = seconds / 3600
             minutes = seconds / 60
+
+            # display largest amount of time
             if hours > 1:
-                await ctx.send(
-                    "{}, Your daily is not available yet. It should be available in {:0.1f} hours".format(
-                        ctx.author.name, hours))
+                unit = "hours"
+                time = hours
             elif minutes > 1:
-                await ctx.send(
-                    "{}, Your daily is not available yet. It should be available in {:0.1f} minutes".format(
-                        ctx.author.name, minutes))
+                unit = "minutes"
+                time = minutes
             else:
-                await ctx.send(
-                    "{}, Your daily is not available yet. It should be available in {:0.0f} seconds".format(
-                        ctx.author.name, seconds))
+                unit = "seconds"
+                time = seconds
+            await ctx.send(
+                "{}, Your greedy scoundrel! You get rations once a day or it\'ll just be hardtack for ye. "
+                "Come back in {:0.1f} {}".format(ctx.author.name, time, unit))
         elif isinstance(error, commands.NoPrivateMessage):
             try:
                 return await ctx.author.send(f'{ctx.command} can not be used in Private Messages.')
             except:
                 pass
 
+
 if __name__ == "__main__":
-    description = 'A pirate ship bot. Lets you fight other users and upgrade your ship. Sail on captain! \n Prefix is $'
+    description = 'A pirate ship bot. Lets you fight other users and upgrade your ship. Sail on captain! ' \
+                  '\n Prefix is $ and cannot be changed right now'
     bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description=description, case_insensitive=True)
     bot.add_cog(Pirate(bot))
     error_handler.setup(bot)

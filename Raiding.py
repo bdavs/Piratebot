@@ -85,6 +85,15 @@ class Raiding(commands.Cog):
 
         await ctx.send('You encounter a {}, {} \n it can deal {} damage'.format(encounter.name, encounter.description, encounter.attack))
 
+        if encounter.defense > user_ship.hull:
+            await ctx.send('Their defense is greater than yours')
+        elif encounter.defense <= user_ship.hull:
+            await ctx.send('You are stronger')
+
+        rewards = encounter.reward
+        user_ship.gold += int(rewards[0])
+        user_ship.update()
+
         return
 
     @raid.command(hidden=True)
@@ -159,7 +168,8 @@ class Encounter:
             for line in f:
                 data.append(line.strip())
 
-        return cls(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7])
+        return cls(data[0], int(data[1]), int(data[2]), int(data[3]), int(data[4]), list(data[3].split(",")), data[6], bool(data[7]))
+        # return cls(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7])
 
     def attack(self):
         return

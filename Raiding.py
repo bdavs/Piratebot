@@ -68,7 +68,7 @@ class Raiding(commands.Cog):
         else:
             await ctx.send('invalid direction')
 
-        await ctx.send('Yer new location is {},{}'.format(user_ship.x,user_ship.y))
+        await ctx.send('Yer new location is {},{}'.format(user_ship.x, user_ship.y))
 
         user_ship.update()
 
@@ -84,6 +84,27 @@ class Raiding(commands.Cog):
         encounter = Encounter.from_filename(encounters_dir + "/" + encounter_file)
 
         await ctx.send('You encounter a {}, {} \n it can deal {} damage'.format(encounter.name, encounter.description, encounter.attack))
+
+        attacker_msg = ""
+        defender_msg = ""
+
+        while user_ship.hull > 0 and encounter.defense > 0:
+            attack = user_ship.crew * 20
+            attack = random.randint(1, attack)
+            # attack += user_ship.cannons + user_ship.crew
+
+            defense = encounter.defense * 20
+            defense = random.randint(1, defense)
+            # defense += defender_ship.cannons + defender_ship.crew
+
+
+            defense -= attack
+            # .damage_hull(attack)
+            user_ship.damage_hull(defense)
+
+            attacker_msg += 'Fired a volley of **{}** cannonballs <a:cannon:554558216889958400> \n'.format(attack)
+            defender_msg += '<a:cannon_reversed:554722119905181735> Return fired a volley of **{}** cannonballs \n'.format(
+                defense)
 
         if encounter.defense > user_ship.hull:
             await ctx.send('Their defense is greater than yours')
@@ -168,7 +189,7 @@ class Encounter:
             for line in f:
                 data.append(line.strip())
 
-        return cls(data[0], int(data[1]), int(data[2]), int(data[3]), int(data[4]), list(data[3].split(",")), data[6], bool(data[7]))
+        return cls(data[0], int(data[1]), int(data[2]), int(data[3]), int(data[4]), list(data[5].split(",")), data[6], bool(data[7]))
         # return cls(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7])
 
     def attack(self):
